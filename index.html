@@ -1,221 +1,164 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>osu! Утилиты — калькулятор модов, AR/OD, точности и BPM</title>
-<meta name="description" content="Бесплатные утилиты для osu!: калькулятор AR/OD/CS/HP с модами HR, DT, EZ, HT, точность и ранг, окна попаданий, BPM и тап-BPM.">
-<meta name="keywords" content="osu, osu!, калькулятор osu, AR OD CS калькулятор, моды osu, тап BPM, accuracy osu">
+<title>osu! Утилиты — каталог программ и сайтов</title>
+<meta name="description" content="Каталог лучших программ и сайтов для osu!: скины, реплеи, коллекции карт, статистика, инструменты мапперов и развлечения.">
+<meta name="keywords" content="osu, osu!, osu tools, osu утилиты, скины osu, реплеи osu, коллекции osu">
 <meta property="og:title" content="osu! Утилиты">
-<meta property="og:description" content="Калькуляторы модов, точности, окон попаданий и BPM для osu!">
+<meta property="og:description" content="Каталог программ и сайтов для osu!">
 <meta property="og:type" content="website">
 <style>
 :root{--bg:#1a1520;--card:#261e30;--card2:#322840;--text:#f2ecf7;--muted:#a99bb8;--pink:#ff66aa;--blue:#66ccff;--line:#3d3250}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
-header{padding:28px 16px 8px;text-align:center}
+header{padding:28px 16px 16px;text-align:center;position:relative}
 h1{margin:0;font-size:2rem}h1 span{color:var(--pink)}
 header p{margin:4px 0 0;color:var(--muted)}
-nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:16px}
-nav button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit}
-nav button.active{background:var(--pink);border-color:var(--pink);color:#fff;font-weight:600}
+.lang{position:absolute;top:16px;right:16px;display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{background:var(--card);color:var(--muted);border:0;padding:6px 12px;cursor:pointer;font:inherit;font-size:.85rem;font-weight:600}
+.lang button.on{background:var(--pink);color:#fff}
 main{max-width:760px;margin:0 auto;padding:0 16px 48px}
-section{display:none;background:var(--card);border-radius:16px;padding:20px}
-section.active{display:block}
+section{background:var(--card);border-radius:16px;padding:20px}
 h2{margin:0 0 4px}.sub{color:var(--muted);margin:0 0 16px}
-label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
-input[type=number]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
-input:focus{outline:2px solid var(--pink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
-.mods{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.mods button{background:var(--card2);color:var(--text);border:2px solid transparent;border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit;font-weight:600}
-.mods button.on{border-color:var(--blue);color:var(--blue)}
-.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:18px}
-.stat{background:var(--card2);border-radius:12px;padding:12px;text-align:center}
-.stat b{display:block;font-size:1.5rem;color:var(--pink)}
-.stat small{color:var(--muted)}
-.big{font-size:3rem;font-weight:800;color:var(--pink)}
-table{width:100%;border-collapse:collapse;margin-top:12px}
-td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
-th{color:var(--muted);font-weight:500}
-.tap{width:100%;height:140px;margin-top:12px;border:0;border-radius:16px;background:var(--pink);color:#fff;font:700 1.4rem inherit;cursor:pointer;user-select:none}
-.tap:active{transform:scale(.98);background:#e0558f}
-.act{margin-top:10px;background:var(--card2);color:var(--text);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font:inherit}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.filters button{background:var(--card2);color:var(--text);border:2px solid transparent;border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit;font-weight:600}
+.filters button.on{border-color:var(--blue);color:var(--blue)}
+#c-search{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:10px 16px;font:inherit}
+#c-search:focus{outline:2px solid var(--pink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
+.card{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:999px 16px 16px 999px;padding:10px 16px 10px 10px;color:var(--text);text-decoration:none;border:1px solid transparent;transition:transform .15s}
+.card:hover{border-color:var(--c);transform:translateX(3px)}
+.hc{position:relative;flex:none;width:48px;height:48px;border-radius:50%;background:var(--c);color:#1a1520;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 3px #fff}
+.hc::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--c);opacity:0;transform:scale(1.8)}
+.card:hover .hc::after{animation:approach .6s ease-out infinite}
+@keyframes approach{0%{opacity:.9;transform:scale(1.8)}100%{opacity:0;transform:scale(1)}}
+.ct{min-width:0}
+.card b{display:block}
+.card p{margin:2px 0 4px;color:var(--muted);font-size:.85rem;line-height:1.3}
+.tag{font-size:.72rem;color:var(--c)}
 footer{text-align:center;color:var(--muted);padding:0 16px 32px;font-size:.85rem}
 </style>
 </head>
 <body>
 <header>
-  <h1><span>osu!</span> Утилиты</h1>
-  <p>Набор калькуляторов для игроков и мапперов — всё считается в браузере</p>
+  <div class="lang"><button data-l="ru">RU</button><button data-l="en">EN</button></div>
+  <h1><span>osu!</span> <span id="t-title" style="color:inherit"></span></h1>
+  <p id="t-sub"></p>
 </header>
-<nav id="nav"></nav>
 <main>
-
-<section id="mods">
-  <h2>Моды и сложность</h2>
-  <p class="sub">Реальные AR / OD / CS / HP, BPM и длина карты с учётом модов.</p>
-  <div class="grid">
-    <div><label>CS</label><input type="number" id="m-cs" value="4" step="0.1" min="0" max="10"></div>
-    <div><label>AR</label><input type="number" id="m-ar" value="9" step="0.1" min="0" max="11"></div>
-    <div><label>OD</label><input type="number" id="m-od" value="8" step="0.1" min="0" max="11"></div>
-    <div><label>HP</label><input type="number" id="m-hp" value="5" step="0.1" min="0" max="10"></div>
-    <div><label>BPM</label><input type="number" id="m-bpm" value="180" step="1" min="1"></div>
-    <div><label>Длина (сек)</label><input type="number" id="m-len" value="120" step="1" min="1"></div>
-  </div>
-  <div class="mods" id="m-btns">
-    <button data-m="EZ">EZ</button><button data-m="HR">HR</button>
-    <button data-m="HT">HT</button><button data-m="DT">DT / NC</button>
-  </div>
-  <div class="res" id="m-res"></div>
+<section>
+  <h2 id="t-h2"></h2>
+  <p class="sub" id="t-note"></p>
+  <input type="search" id="c-search">
+  <div class="filters" id="c-filter"></div>
+  <div class="cards" id="c-list"></div>
 </section>
-
-<section id="acc">
-  <h2>Точность и ранг</h2>
-  <p class="sub">osu!standard: введи количество попаданий.</p>
-  <div class="grid">
-    <div><label>300</label><input type="number" id="a-300" value="500" min="0"></div>
-    <div><label>100</label><input type="number" id="a-100" value="10" min="0"></div>
-    <div><label>50</label><input type="number" id="a-50" value="0" min="0"></div>
-    <div><label>Miss</label><input type="number" id="a-0" value="0" min="0"></div>
-  </div>
-  <div class="res">
-    <div class="stat"><b id="a-acc">—</b><small>Accuracy</small></div>
-    <div class="stat"><b id="a-rank">—</b><small>Ранг (без HD/FL)</small></div>
-    <div class="stat"><b id="a-tot">—</b><small>Всего нот</small></div>
-  </div>
-</section>
-
-<section id="win">
-  <h2>Окна попаданий</h2>
-  <p class="sub">Допуск в миллисекундах (±) для заданного OD.</p>
-  <div class="grid"><div><label>OD</label><input type="number" id="w-od" value="8" step="0.1" min="0" max="11"></div></div>
-  <table id="w-tbl"></table>
-</section>
-
-<section id="bpm">
-  <h2>BPM и снапы</h2>
-  <p class="sub">Длительность долей в миллисекундах — удобно для мапперов.</p>
-  <div class="grid"><div><label>BPM</label><input type="number" id="b-bpm" value="180" step="0.01" min="1"></div></div>
-  <table id="b-tbl"></table>
-</section>
-
-<section id="tap">
-  <h2>Тап-BPM</h2>
-  <p class="sub">Нажимай в такт музыке (кнопка или пробел).</p>
-  <button class="tap" id="t-btn">TAP</button>
-  <div class="res">
-    <div class="stat"><b id="t-bpm">—</b><small>BPM</small></div>
-    <div class="stat"><b id="t-cnt">0</b><small>Тапов</small></div>
-  </div>
-  <button class="act" id="t-reset">Сбросить</button>
-</section>
-
 </main>
-<footer>Неофициальный проект, не связан с ppy Pty Ltd. osu! — торговая марка ppy.</footer>
+<footer id="t-foot"></footer>
 
 <script>
 const $ = id => document.getElementById(id);
-const num = id => parseFloat($(id).value) || 0;
-const r2 = x => Math.round(x * 100) / 100;
 
-// ---- вкладки ----
-const tabs = [['mods','Моды'],['acc','Точность'],['win','Окна попаданий'],['bpm','BPM / снапы'],['tap','Тап-BPM']];
-const nav = $('nav');
-tabs.forEach(([id, name], i) => {
-  const b = document.createElement('button');
-  b.textContent = name; b.dataset.id = id;
-  b.onclick = () => show(id);
-  nav.appendChild(b);
-});
-function show(id){
-  tabs.forEach(([t]) => $(t).classList.toggle('active', t === id));
-  [...nav.children].forEach(b => b.classList.toggle('active', b.dataset.id === id));
-  location.hash = id;
-}
-
-// ---- моды ----
-const arToMs = ar => ar <= 5 ? 1800 - 120 * ar : 1200 - 150 * (ar - 5);
-const msToAr = ms => ms > 1200 ? (1800 - ms) / 120 : 5 + (1200 - ms) / 150;
-const mods = new Set();
-document.querySelectorAll('#m-btns button').forEach(b => b.onclick = () => {
-  const m = b.dataset.m;
-  if (mods.has(m)) mods.delete(m); else {
-    mods.add(m);
-    if (m === 'EZ') mods.delete('HR'); if (m === 'HR') mods.delete('EZ');
-    if (m === 'HT') mods.delete('DT'); if (m === 'DT') mods.delete('HT');
+const I18N = {
+  ru: {
+    title: 'Утилиты', sub: 'Каталог полезных программ и сайтов для игроков и мапперов',
+    h2: 'Каталог программ и сайтов', note: 'Подборка лучших сторонних инструментов для osu!. Все ссылки ведут на сайты их авторов.',
+    search: 'Поиск по каталогу…', all: 'Все', none: 'Ничего не найдено',
+    foot: 'Неофициальный проект, не связан с ppy Pty Ltd. osu! — торговая марка ppy.',
+    doc: 'osu! Утилиты — каталог программ и сайтов',
+    cats: {skins:'Скины', clients:'Клиенты и реплеи', maps:'Карты и коллекции', stats:'Статистика', mapping:'Мапперам', stream:'Стрим и турниры', fun:'Развлечения'}
+  },
+  en: {
+    title: 'Tools', sub: 'A catalog of useful programs and websites for players and mappers',
+    h2: 'Programs and websites', note: 'A selection of the best third-party tools for osu!. All links lead to the authors\' sites.',
+    search: 'Search the catalog…', all: 'All', none: 'Nothing found',
+    foot: 'Unofficial project, not affiliated with ppy Pty Ltd. osu! is a trademark of ppy.',
+    doc: 'osu! Tools — catalog of programs and websites',
+    cats: {skins:'Skins', clients:'Clients & replays', maps:'Maps & collections', stats:'Statistics', mapping:'For mappers', stream:'Streaming & tournaments', fun:'Fun'}
   }
-  document.querySelectorAll('#m-btns button').forEach(x => x.classList.toggle('on', mods.has(x.dataset.m)));
-  calcMods();
+};
+
+// [название, описание RU, описание EN, категория, ссылка]
+const tools = [
+  ['skins.osuck', 'Каталог скинов', 'Skin catalog', 'skins', 'https://skins.osuck.net/'],
+  ['osu! skins', 'Каталог скинов для osu!', 'Skin catalog for osu!', 'skins', 'https://osuskins.net/'],
+  ['skinhub', 'Проект для работы со скинами (GitHub)', 'A project for working with skins (GitHub)', 'skins', 'https://github.com/ryancranie/skinhub'],
+
+  ['McOsu', 'Клиент osu! на C++ с необычными фишками', 'An osu! client written in C++ with unique features', 'clients', 'https://store.steampowered.com/app/607260/McOsu/'],
+  ['neomod', 'Альтернативный клиент osu!', 'An alternative osu! client', 'clients', 'https://neomod.net/'],
+  ['danser', 'Рендер реплеев с красивыми эффектами', 'Replay renderer with fancy effects', 'clients', 'https://github.com/Wieku/danser-go'],
+  ['o!rdr', 'Онлайн-рендер реплеев в видео', 'Online replay-to-video renderer', 'clients', 'https://ordr.issou.best/'],
+  ['rewind', 'Просмотр и анализ реплеев', 'Replay viewer and analyzer', 'clients', 'https://github.com/abstrakt8/rewind'],
+
+  ['osu!collector', 'Пользовательские коллекции карт', 'Community-made beatmap collections', 'maps', 'https://osucollector.com/'],
+  ['Collection Manager', 'Управление коллекциями карт в osu!', 'Manage your osu! beatmap collections', 'maps', 'https://github.com/Piotrekol/CollectionManager'],
+  ['Collection Helper', 'Помощник для работы с коллекциями', 'A helper for working with collections', 'maps', 'https://github.com/nzbasic/Collection-Helper'],
+  ['osu-pps', 'Поиск «фармилок» — карт, выгодных по PP', 'Find PP farm maps', 'maps', 'https://osu-pps.com/#/osu/maps'],
+  ['osu!farmer', 'Подбор карт для фарма PP', 'Map picks for PP farming', 'maps', 'https://www.osufarmer.com/'],
+  ['Tillerino', 'Бот в osu! для подбора карт под фарм', 'In-game bot that recommends maps to farm', 'maps', 'https://osu.ppy.sh/users/2070907'],
+  ['omdb', 'База данных и оценки карт', 'Beatmap database and ratings', 'maps', 'https://omdb.nyahh.net/'],
+
+  ['Score Inspector', 'Подробная статистика скоров и профиля', 'Detailed score and profile statistics', 'stats', 'https://github.com/darkchii/score-inspector'],
+  ['osu! expert+', 'Дополнительная статистика и анализ', 'Extra statistics and analysis', 'stats', 'https://github.com/inix1257'],
+  ['osu!skills', 'Оценка навыков игрока', 'Player skill evaluation', 'stats', 'https://osuskills.com/'],
+  ['circle-tracker', 'Запись твоих игр в документ и анализ', 'Records your plays to a document for analysis', 'stats', 'https://github.com/FunOrange/circle-tracker'],
+  ['Mutualify', 'Просмотр мутуалов (взаимных подписок)', 'See your mutual follows', 'stats', 'https://mutualify.stanr.info/'],
+
+  ['osucad', 'Онлайн-редактор карт', 'Online beatmap editor', 'mapping', 'https://osucad.com/'],
+  ['o!mt (Mapping Tools)', 'Набор инструментов для маппинга', 'A toolkit for mapping', 'mapping', 'https://mappingtools.github.io/'],
+  ['osu! trainer', 'Изменение параметров карты', 'Change beatmap parameters', 'mapping', 'https://github.com/FunOrange/osu-trainer'],
+
+  ['tosu', 'Виджеты для OBS и стримов по osu!', 'OBS widgets for osu! streams', 'stream', 'https://tosu.app/'],
+  ['Ronnia bot', 'Бот для запросов карт на стриме', 'Bot for map requests on stream', 'stream', 'https://ronnia.me/login'],
+  ['osu team sheets', 'Таблицы команд для турниров', 'Team sheets for tournaments', 'stream', 'https://osusheets.team/'],
+
+  ['osu! gacha', 'Открытие карточек с игроками osu!', 'Open cards of osu! players', 'fun', 'https://gacha.miz.to/'],
+  ['osu! PP casino', 'Казино на PP', 'A PP casino', 'fun', 'https://casino.osutools.cc/'],
+  ['RankGuessr', 'Игра «угадай ранг»', 'A "guess the rank" game', 'fun', 'https://rankguessr.app/'],
+  ['osu! Music Quiz (Luscent)', 'Музыкальная викторина по osu!', 'An osu! music quiz', 'fun', 'https://osumusicquiz.com/'],
+  ['osu! Music Quiz (HyperBCS)', 'Музыкальная викторина по osu!', 'An osu! music quiz', 'fun', 'https://omq.bcs.dev/app']
+];
+const colors = ['#ff66aa', '#66ccff', '#b3e86f', '#ffd166', '#c792ff', '#ff8a5c'];
+
+let saved = null;
+try { saved = localStorage.getItem('lang'); } catch (e) {}
+let lang = saved in I18N ? saved : ((navigator.language || '').toLowerCase().startsWith('ru') ? 'ru' : 'en');
+let cFilter = 'all', cQuery = '';
+
+function render(){
+  const t = I18N[lang];
+  document.documentElement.lang = lang;
+  document.title = t.doc;
+  $('t-title').textContent = t.title; $('t-sub').textContent = t.sub;
+  $('t-h2').textContent = t.h2; $('t-note').textContent = t.note;
+  $('t-foot').textContent = t.foot; $('c-search').placeholder = t.search;
+  document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+
+  $('c-filter').innerHTML = '';
+  ['all', ...Object.keys(t.cats)].forEach(k => {
+    const b = document.createElement('button');
+    b.textContent = k === 'all' ? t.all : t.cats[k];
+    if (k === cFilter) b.className = 'on';
+    b.onclick = () => { cFilter = k; render(); };
+    $('c-filter').appendChild(b);
+  });
+
+  const q = cQuery.trim().toLowerCase(), li = lang === 'ru' ? 1 : 2;
+  const list = tools.filter(x => (cFilter === 'all' || x[3] === cFilter) && (!q || (x[0] + ' ' + x[li]).toLowerCase().includes(q)));
+  $('c-list').innerHTML = list.map((x, i) =>
+    `<a class="card" href="${x[4]}" target="_blank" rel="noopener noreferrer" style="--c:${colors[i % colors.length]}"><span class="hc">${i + 1}</span><span class="ct"><b>${x[0]}</b><p>${x[li]}</p><span class="tag">${t.cats[x[3]]}</span></span></a>`).join('')
+    || `<p class="sub">${t.none}</p>`;
+}
+
+document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
+  lang = b.dataset.l;
+  try { localStorage.setItem('lang', lang); } catch (e) {}
+  render();
 });
-function calcMods(){
-  let cs = num('m-cs'), ar = num('m-ar'), od = num('m-od'), hp = num('m-hp');
-  if (mods.has('HR')) { cs = Math.min(cs * 1.3, 10); ar = Math.min(ar * 1.4, 10); od = Math.min(od * 1.4, 10); hp = Math.min(hp * 1.4, 10); }
-  if (mods.has('EZ')) { cs /= 2; ar /= 2; od /= 2; hp /= 2; }
-  const rate = mods.has('DT') ? 1.5 : mods.has('HT') ? 0.75 : 1;
-  const arF = msToAr(arToMs(ar) / rate);
-  const odF = (80 - (80 - 6 * od) / rate) / 6;
-  const len = num('m-len') / rate, mm = Math.floor(len / 60), ss = Math.round(len % 60);
-  const items = [['CS', r2(cs)], ['AR', r2(arF)], ['OD', r2(odF)], ['HP', r2(hp)],
-    ['BPM', r2(num('m-bpm') * rate)], ['Длина', mm + ':' + String(ss).padStart(2, '0')],
-    ['Время появления', Math.round(arToMs(ar) / rate) + ' мс']];
-  $('m-res').innerHTML = items.map(([k, v]) => `<div class="stat"><b>${v}</b><small>${k}</small></div>`).join('');
-}
-['m-cs','m-ar','m-od','m-hp','m-bpm','m-len'].forEach(i => $(i).oninput = calcMods);
-
-// ---- точность ----
-function calcAcc(){
-  const n3 = num('a-300'), n1 = num('a-100'), n5 = num('a-50'), n0 = num('a-0');
-  const t = n3 + n1 + n5 + n0;
-  if (!t) { $('a-acc').textContent = '—'; $('a-rank').textContent = '—'; $('a-tot').textContent = 0; return; }
-  const acc = (300 * n3 + 100 * n1 + 50 * n5) / (300 * t) * 100;
-  const p3 = n3 / t, p5 = n5 / t;
-  let rank = 'D';
-  if (acc === 100) rank = 'SS';
-  else if (p3 > .9 && p5 <= .01 && n0 === 0) rank = 'S';
-  else if ((p3 > .8 && n0 === 0) || p3 > .9) rank = 'A';
-  else if ((p3 > .7 && n0 === 0) || p3 > .8) rank = 'B';
-  else if (p3 > .6) rank = 'C';
-  $('a-acc').textContent = acc.toFixed(2) + '%';
-  $('a-rank').textContent = rank; $('a-tot').textContent = t;
-}
-['a-300','a-100','a-50','a-0'].forEach(i => $(i).oninput = calcAcc);
-
-// ---- окна попаданий ----
-function calcWin(){
-  const od = num('w-od');
-  $('w-tbl').innerHTML = '<tr><th>Оценка</th><th>Окно (±мс)</th><th>DT</th><th>HT</th></tr>' +
-    [['300', 80 - 6 * od], ['100', 140 - 8 * od], ['50', 200 - 10 * od]].map(([n, w]) =>
-      `<tr><td>${n}</td><td>${r2(w)}</td><td>${r2(w / 1.5)}</td><td>${r2(w / .75)}</td></tr>`).join('');
-}
-$('w-od').oninput = calcWin;
-
-// ---- BPM / снапы ----
-function calcBpm(){
-  const bpm = num('b-bpm'); if (bpm <= 0) { $('b-tbl').innerHTML = ''; return; }
-  const beat = 60000 / bpm;
-  $('b-tbl').innerHTML = '<tr><th>Снап</th><th>мс</th><th>Нот/сек</th></tr>' +
-    [1, 2, 3, 4, 6, 8, 12, 16].map(d => `<tr><td>1/${d}</td><td>${r2(beat / d)}</td><td>${r2(1000 / (beat / d))}</td></tr>`).join('');
-}
-$('b-bpm').oninput = calcBpm;
-
-// ---- тап-BPM ----
-let taps = [];
-function tap(){
-  const now = performance.now();
-  if (taps.length && now - taps[taps.length - 1] > 3000) taps = [];
-  taps.push(now);
-  $('t-cnt').textContent = taps.length;
-  if (taps.length > 1) $('t-bpm').textContent = r2((taps.length - 1) / (now - taps[0]) * 60000);
-}
-$('t-btn').onmousedown = e => { e.preventDefault(); tap(); };
-$('t-reset').onclick = () => { taps = []; $('t-bpm').textContent = '—'; $('t-cnt').textContent = 0; };
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space' && $('tap').classList.contains('active')) { e.preventDefault(); if (!e.repeat) tap(); }
-});
-
-calcMods(); calcAcc(); calcWin(); calcBpm();
-show(tabs.some(t => t[0] === location.hash.slice(1)) ? location.hash.slice(1) : 'mods');
+$('c-search').oninput = e => { cQuery = e.target.value; render(); };
+render();
 </script>
 </body>
 </html>
