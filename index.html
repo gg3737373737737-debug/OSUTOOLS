@@ -27,6 +27,7 @@ section{display:none;background:var(--card);border-radius:16px;padding:20px}
 section.active{display:block}
 .guide ol{padding-left:22px}.guide li{margin:10px 0}
 .guide a{color:var(--blue)}
+code{background:var(--card2);border-radius:4px;padding:1px 6px;font-size:.9em}
 .guide h3{margin:20px 0 6px}
 .warn{background:var(--card2);border-left:4px solid #ffd166;border-radius:8px;padding:10px 14px;margin:14px 0}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
@@ -61,8 +62,18 @@ footer{text-align:center;color:var(--muted);padding:0 16px 32px;font-size:.85rem
 <nav id="nav">
   <button data-t="cat" id="n-cat"></button>
   <button data-t="guide" id="n-guide"></button>
+  <button data-t="dev" id="n-dev"></button>
 </nav>
 <main>
+<section id="dev" class="guide">
+  <h2 id="d-h2"></h2>
+  <p class="sub" id="d-intro"></p>
+  <h3 id="d-st"></h3>
+  <ol id="d-steps"></ol>
+  <h3 id="d-bt"></h3>
+  <ul id="d-br"></ul>
+  <div class="warn" id="d-warn"></div>
+</section>
 <section id="guide" class="guide">
   <h2 id="g-h2"></h2>
   <p class="sub" id="g-intro"></p>
@@ -94,7 +105,18 @@ const I18N = {
     foot: 'Неофициальный проект, не связан с ppy Pty Ltd. osu! — торговая марка ppy.',
     doc: 'osu! Утилиты — каталог программ и сайтов',
     cats: {skins:'Скины', clients:'Клиенты и реплеи', maps:'Карты и коллекции', stats:'Статистика', mapping:'Мапперам', stream:'Стрим и турниры', fun:'Развлечения'},
-    tabCat: 'Каталог', tabGuide: 'osuplus — гайд',
+    tabCat: 'Каталог', tabGuide: 'osuplus — гайд', tabDev: 'Режим разработчика',
+    dH2: 'Как включить режим разработчика',
+    dIntro: 'Нужен, чтобы пользовательские скрипты (Tampermonkey, osuplus и др.) работали в браузерах на Chromium: Chrome, Edge, Opera, Brave.',
+    dSt: 'Общие шаги',
+    dSteps: [
+      'Открой страницу расширений в адресной строке: <code>chrome://extensions</code> (Chrome), <code>edge://extensions</code> (Edge), <code>opera://extensions</code> (Opera) или <code>brave://extensions</code> (Brave). Либо меню браузера → «Расширения» → «Управление расширениями».',
+      'Найди переключатель <b>«Режим разработчика»</b> (Developer mode) и включи его.',
+      'Обнови страницу osu! (F5), чтобы скрипт заработал.'
+    ],
+    dBt: 'Где находится переключатель',
+    dBr: ['<b>Chrome, Opera, Brave:</b> в правом верхнем углу страницы расширений.', '<b>Edge:</b> в левой панели страницы расширений, внизу.'],
+    dWarn: '<b>Если в Chrome новой версии это не помогло:</b> нажми «Сведения» у Tampermonkey на странице расширений и включи пункт <b>«Разрешить пользовательские скрипты»</b> (Allow User Scripts). В новых версиях Chrome он заменяет режим разработчика. Названия пунктов могут немного отличаться в зависимости от версии браузера. Точную инструкцию смотри в FAQ Tampermonkey.',
     gH2: 'osuplus — доп. возможности на сайте osu!',
     gIntro: 'Пользовательский скрипт (userscript) от oneplusone: добавляет новые функции на страницы osu! в браузере. Работает в Chrome, Firefox и Opera.',
     gBtn1: 'Тема на форуме osu!', gBtn2: 'Скачать скрипт (GitHub)', gBtn3: 'Исходный код',
@@ -104,7 +126,7 @@ const I18N = {
     gSteps: [
       'Установи расширение для пользовательских скриптов: <b>Tampermonkey</b> (или Greasemonkey). Бери его только из официального магазина расширений своего браузера и убедись, что оно включено.',
       'Открой <a href="https://github.com/limjeck/osuplus/raw/master/osuplus.user.js" target="_blank" rel="noopener noreferrer">ссылку на скрипт osuplus.user.js</a> (версия 2.4.3). Tampermonkey откроет вкладку с предложением установки — подтверди установку.',
-      'В браузерах на Chromium (Chrome, Edge, Opera) может понадобиться включить «Режим разработчика» для расширений, иначе скрипт не запустится. Инструкция есть в FAQ Tampermonkey.',
+      'В браузерах на Chromium (Chrome, Edge, Opera) может понадобиться включить «Режим разработчика» для расширений, иначе скрипт не запустится. <a href="#dev" data-go="dev">Как это сделать →</a>',
       'Открой любую страницу osu! (osu.ppy.sh). Вверху появится красный баннер с просьбой ввести ключи osu!API.',
       'Получи ключи по <a href="https://github.com/limjeck/osuplus/blob/master/APIv2.md" target="_blank" rel="noopener noreferrer">инструкции автора (APIv2.md)</a>: нужны Client ID и Client Secret.',
       'Нажми «here» в красном баннере и вставь Client ID и Client Secret, когда скрипт попросит.'
@@ -118,7 +140,18 @@ const I18N = {
     foot: 'Unofficial project, not affiliated with ppy Pty Ltd. osu! is a trademark of ppy.',
     doc: 'osu! Tools — catalog of programs and websites',
     cats: {skins:'Skins', clients:'Clients & replays', maps:'Maps & collections', stats:'Statistics', mapping:'For mappers', stream:'Streaming & tournaments', fun:'Fun'},
-    tabCat: 'Catalog', tabGuide: 'osuplus guide',
+    tabCat: 'Catalog', tabGuide: 'osuplus guide', tabDev: 'Developer mode',
+    dH2: 'How to enable Developer mode',
+    dIntro: 'Needed so that userscripts (Tampermonkey, osuplus, etc.) work in Chromium-based browsers: Chrome, Edge, Opera, Brave.',
+    dSt: 'General steps',
+    dSteps: [
+      'Open the extensions page from the address bar: <code>chrome://extensions</code> (Chrome), <code>edge://extensions</code> (Edge), <code>opera://extensions</code> (Opera) or <code>brave://extensions</code> (Brave). Or use the browser menu → Extensions → Manage extensions.',
+      'Find the <b>"Developer mode"</b> switch and turn it on.',
+      'Reload the osu! page (F5) so the script starts working.'
+    ],
+    dBt: 'Where the switch is',
+    dBr: ['<b>Chrome, Opera, Brave:</b> in the top-right corner of the extensions page.', '<b>Edge:</b> in the left sidebar of the extensions page, near the bottom.'],
+    dWarn: '<b>If that did not help in a recent Chrome:</b> click "Details" on Tampermonkey in the extensions page and turn on <b>"Allow User Scripts"</b>. In newer Chrome versions it replaces Developer mode. Option names may differ slightly between browser versions. See the Tampermonkey FAQ for exact instructions.',
     gH2: 'osuplus — extra features on the osu! website',
     gIntro: 'A userscript by oneplusone that adds new features to osu! web pages in your browser. Works in Chrome, Firefox and Opera.',
     gBtn1: 'osu! forum thread', gBtn2: 'Download script (GitHub)', gBtn3: 'Source code',
@@ -128,7 +161,7 @@ const I18N = {
     gSteps: [
       'Install a userscript manager: <b>Tampermonkey</b> (or Greasemonkey). Get it only from your browser\'s official extension store and make sure it is enabled.',
       'Open the <a href="https://github.com/limjeck/osuplus/raw/master/osuplus.user.js" target="_blank" rel="noopener noreferrer">osuplus.user.js script link</a> (version 2.4.3). Tampermonkey will open a tab offering to install it — confirm the installation.',
-      'On Chromium-based browsers (Chrome, Edge, Opera) you may need to enable Developer Mode for extensions, otherwise the script will not run. See the Tampermonkey FAQ for instructions.',
+      'On Chromium-based browsers (Chrome, Edge, Opera) you may need to enable Developer Mode for extensions, otherwise the script will not run. <a href="#dev" data-go="dev">How to do it →</a>',
       'Open any osu! page (osu.ppy.sh). A red banner asking for your osu! API keys will appear at the top.',
       'Get the keys by following <a href="https://github.com/limjeck/osuplus/blob/master/APIv2.md" target="_blank" rel="noopener noreferrer">the author\'s instructions (APIv2.md)</a>: you need a Client ID and a Client Secret.',
       'Click "here" in the red banner and paste your Client ID and Client Secret when the script asks.'
@@ -160,6 +193,7 @@ const tools = [
   ['Score Inspector', 'Подробная статистика скоров и профиля', 'Detailed score and profile statistics', 'stats', 'https://github.com/darkchii/score-inspector'],
   ['osuplus', 'Скрипт с доп. функциями для сайта osu! (см. вкладку «osuplus — гайд»)', 'Userscript with extra features for the osu! website (see the "osuplus guide" tab)', 'stats', 'https://osu.ppy.sh/community/forums/topics/408541?n=1'],
   ['osu! expert+', 'Дополнительная статистика и анализ', 'Extra statistics and analysis', 'stats', 'https://github.com/inix1257'],
+  ['osu!chan', 'Сайт со статистикой игроков osu!', 'Player statistics site for osu!', 'stats', 'https://osuchan.syrin.me/'],
   ['osu!skills', 'Оценка навыков игрока', 'Player skill evaluation', 'stats', 'https://osuskills.com/'],
   ['circle-tracker', 'Запись твоих игр в документ и анализ', 'Records your plays to a document for analysis', 'stats', 'https://github.com/FunOrange/circle-tracker'],
   ['Mutualify', 'Просмотр мутуалов (взаимных подписок)', 'See your mutual follows', 'stats', 'https://mutualify.stanr.info/'],
@@ -183,13 +217,23 @@ let saved = null;
 try { saved = localStorage.getItem('lang'); } catch (e) {}
 let lang = saved in I18N ? saved : ((navigator.language || '').toLowerCase().startsWith('ru') ? 'ru' : 'en');
 let cFilter = 'all', cQuery = '';
-let tab = location.hash === '#guide' ? 'guide' : 'cat';
+const TABS = ['cat', 'guide', 'dev'];
+let tab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'cat';
+function go(t){
+  tab = t; try { history.replaceState(null, '', t === 'cat' ? location.pathname : '#' + t); } catch (e) {}
+  render(); window.scrollTo(0, 0);
+}
 
 function render(){
   const t = I18N[lang];
-  $('n-cat').textContent = t.tabCat; $('n-guide').textContent = t.tabGuide;
+  $('n-cat').textContent = t.tabCat; $('n-guide').textContent = t.tabGuide; $('n-dev').textContent = t.tabDev;
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.t === tab));
-  $('cat').classList.toggle('active', tab === 'cat'); $('guide').classList.toggle('active', tab === 'guide');
+  TABS.forEach(k => $(k).classList.toggle('active', tab === k));
+  $('d-h2').textContent = t.dH2; $('d-intro').textContent = t.dIntro;
+  $('d-st').textContent = t.dSt; $('d-bt').textContent = t.dBt;
+  $('d-steps').innerHTML = t.dSteps.map(x => `<li>${x}</li>`).join('');
+  $('d-br').innerHTML = t.dBr.map(x => `<li>${x}</li>`).join('');
+  $('d-warn').innerHTML = t.dWarn;
   $('g-h2').textContent = t.gH2; $('g-intro').textContent = t.gIntro;
   $('g-btns').innerHTML = `<a href="https://osu.ppy.sh/community/forums/topics/408541?n=1" target="_blank" rel="noopener noreferrer">${t.gBtn1}</a><a href="https://github.com/limjeck/osuplus/raw/master/osuplus.user.js" target="_blank" rel="noopener noreferrer">${t.gBtn2}</a><a class="alt" href="https://github.com/limjeck/osuplus" target="_blank" rel="noopener noreferrer">${t.gBtn3}</a>`;
   $('g-ft').textContent = t.gFt; $('g-st').textContent = t.gSt;
@@ -224,9 +268,10 @@ document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
   try { localStorage.setItem('lang', lang); } catch (e) {}
   render();
 });
-document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
-  tab = b.dataset.t; try { history.replaceState(null, '', tab === 'guide' ? '#guide' : location.pathname); } catch (e) {}
-  render();
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => go(b.dataset.t));
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[data-go]');
+  if (a) { e.preventDefault(); go(a.dataset.go); }
 });
 $('c-search').oninput = e => { cQuery = e.target.value; render(); };
 render();
