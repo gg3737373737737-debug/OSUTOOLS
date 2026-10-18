@@ -62,18 +62,8 @@ footer{text-align:center;color:var(--muted);padding:0 16px 32px;font-size:.85rem
 <nav id="nav">
   <button data-t="cat" id="n-cat"></button>
   <button data-t="guide" id="n-guide"></button>
-  <button data-t="dev" id="n-dev"></button>
 </nav>
 <main>
-<section id="dev" class="guide">
-  <h2 id="d-h2"></h2>
-  <p class="sub" id="d-intro"></p>
-  <h3 id="d-st"></h3>
-  <ol id="d-steps"></ol>
-  <h3 id="d-bt"></h3>
-  <ul id="d-br"></ul>
-  <div class="warn" id="d-warn"></div>
-</section>
 <section id="guide" class="guide">
   <h2 id="g-h2"></h2>
   <p class="sub" id="g-intro"></p>
@@ -83,6 +73,14 @@ footer{text-align:center;color:var(--muted);padding:0 16px 32px;font-size:.85rem
   <h3 id="g-st"></h3>
   <ol id="g-steps"></ol>
   <div class="warn" id="g-warn"></div>
+  <div id="dev">
+    <h2 id="d-h2" style="margin-top:28px"></h2>
+    <p class="sub" id="d-intro"></p>
+    <ol id="d-steps"></ol>
+    <h3 id="d-bt"></h3>
+    <ul id="d-br"></ul>
+    <div class="warn" id="d-warn"></div>
+  </div>
 </section>
 <section id="cat">
   <h2 id="t-h2"></h2>
@@ -217,20 +215,22 @@ let saved = null;
 try { saved = localStorage.getItem('lang'); } catch (e) {}
 let lang = saved in I18N ? saved : ((navigator.language || '').toLowerCase().startsWith('ru') ? 'ru' : 'en');
 let cFilter = 'all', cQuery = '';
-const TABS = ['cat', 'guide', 'dev'];
-let tab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'cat';
+const TABS = ['cat', 'guide'];
+let tab = ['guide', 'dev'].includes(location.hash.slice(1)) ? 'guide' : 'cat';
 function go(t){
-  tab = t; try { history.replaceState(null, '', t === 'cat' ? location.pathname : '#' + t); } catch (e) {}
-  render(); window.scrollTo(0, 0);
+  const toDev = t === 'dev';
+  tab = toDev ? 'guide' : t;
+  try { history.replaceState(null, '', tab === 'cat' ? location.pathname : '#guide'); } catch (e) {}
+  render();
+  if (toDev) $('dev').scrollIntoView({ behavior: 'smooth' }); else window.scrollTo(0, 0);
 }
 
 function render(){
   const t = I18N[lang];
-  $('n-cat').textContent = t.tabCat; $('n-guide').textContent = t.tabGuide; $('n-dev').textContent = t.tabDev;
-  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.t === tab));
+  $('n-cat').textContent = t.tabCat; $('n-guide').textContent = t.tabGuide;  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.t === tab));
   TABS.forEach(k => $(k).classList.toggle('active', tab === k));
   $('d-h2').textContent = t.dH2; $('d-intro').textContent = t.dIntro;
-  $('d-st').textContent = t.dSt; $('d-bt').textContent = t.dBt;
+  $('d-bt').textContent = t.dBt;
   $('d-steps').innerHTML = t.dSteps.map(x => `<li>${x}</li>`).join('');
   $('d-br').innerHTML = t.dBr.map(x => `<li>${x}</li>`).join('');
   $('d-warn').innerHTML = t.dWarn;
