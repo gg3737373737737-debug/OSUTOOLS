@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>404 — osu! Утилиты</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+:root{--bg:#1a1520;--card:#261e30;--text:#f2ecf7;--muted:#a99bb8;--pink:#ff66aa;--line:#3d3250}
+:root[data-theme="light"]{--bg:#f6f1fa;--card:#ffffff;--text:#2a2133;--muted:#6f6380;--pink:#e0357f;--line:#ddd1ea}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(rgba(26,21,32,.82),rgba(26,21,32,.82)),url(/bg.jpg) center/cover no-repeat}
+:root[data-theme="light"] body::before{background:linear-gradient(rgba(246,241,250,.8),rgba(246,241,250,.8)),url(/bg.jpg) center/cover no-repeat}
+.box{max-width:460px;width:100%;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px 24px}
+.num{font-size:5rem;font-weight:800;line-height:1;color:var(--pink);margin:0}
+h1{margin:8px 0 6px;font-size:1.4rem}
+p{color:var(--muted);margin:0 0 20px}
+a.btn{display:inline-block;background:var(--pink);color:#fff;text-decoration:none;font-weight:600;border-radius:999px;padding:10px 22px}
+</style>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark'}catch(e){}</script>
+</head>
+<body>
+<div class="box">
+  <p class="num">404</p>
+  <h1 id="h"></h1>
+  <p id="t"></p>
+  <a class="btn" id="b" href="/"></a>
+</div>
+<script>
+var lang = 'ru', saved = null;
+try { saved = localStorage.getItem('lang'); } catch (e) {}
+if (saved === 'ru' || saved === 'en') lang = saved;
+else if ((navigator.language || '').toLowerCase().indexOf('ru') !== 0) lang = 'en';
+var T = {
+  ru: ['Страница не найдена', 'Такой страницы нет. Возможно, ссылка устарела или в адресе опечатка.', 'На главную'],
+  en: ['Page not found', 'This page does not exist. The link may be outdated or the address mistyped.', 'Back to home']
+}[lang];
+document.documentElement.lang = lang;
+document.getElementById('h').textContent = T[0];
+document.getElementById('t').textContent = T[1];
+document.getElementById('b').textContent = T[2];
+</script>
+</body>
+</html>

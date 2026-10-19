@@ -9,14 +9,82 @@
 <meta property="og:title" content="osu! Утилиты">
 <meta property="og:description" content="Каталог программ и сайтов для osu!">
 <meta property="og:type" content="website">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
+<meta property="og:url" content="https://osutools.ru/">
+<meta property="og:image" content="https://osutools.ru/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://osutools.ru/og-image.png">
+<link rel="canonical" href="https://osutools.ru/">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 :root{--bg:#1a1520;--card:#261e30;--card2:#322840;--text:#f2ecf7;--muted:#a99bb8;--pink:#ff66aa;--blue:#66ccff;--line:#3d3250}
+:root[data-theme="light"]{--bg:#f6f1fa;--card:#ffffff;--card2:#efe7f6;--text:#2a2133;--muted:#6f6380;--pink:#e0357f;--blue:#1b7bc4;--line:#ddd1ea}
+.theme{position:absolute;top:16px;left:16px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font-size:1rem;line-height:1;padding:0}
+.suggest{margin:0;background:var(--pink);color:#fff;border:0;border-radius:999px;padding:8px 18px;cursor:pointer;font:inherit;font-weight:600}
+.suggest:hover{filter:brightness(1.08)}
+:root{--overlay:rgba(26,21,32,.8)}
+:root[data-theme="light"]{--overlay:rgba(246,241,250,.78)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(var(--overlay),var(--overlay)),url(bg.jpg) center/cover no-repeat}
+header,nav,main,footer{position:relative;z-index:1}
+#petals{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.logo-wrap{position:relative;display:inline-flex;width:40px;height:40px;margin-right:10px}
+.logo-wrap::before,.logo-wrap::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid var(--pink);opacity:0;animation:ring 2.8s ease-out infinite;pointer-events:none}
+.logo-wrap::after{animation-delay:1.4s}
+@keyframes ring{0%{transform:scale(1);opacity:.75}100%{transform:scale(2.4);opacity:0}}
+#fq-list details{background:var(--card2);border-radius:12px;margin:8px 0;border:1px solid transparent}
+#fq-list details[open]{border-color:var(--pink)}
+#fq-list summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+#fq-list summary::-webkit-details-marker{display:none}
+#fq-list summary::after{content:"+";color:var(--pink);font-size:1.3rem;line-height:1;flex:none}
+#fq-list details[open] summary::after{content:"\2212"}
+#fq-list details p{margin:0;padding:0 16px 14px;color:var(--muted);overflow-wrap:anywhere}
+#fq-list details a{color:var(--blue)}
+.cw{position:relative}
+.cw .card{padding-right:82px;height:100%}
+.gbtn{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);font:700 .85rem/1 inherit;cursor:pointer;padding:0;transition:color .15s,border-color .15s,background .15s}
+.gbtn:hover{color:#fff;background:var(--c);border-color:var(--c)}
+.modal{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(10,6,16,.6);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.modal.open{display:flex}
+.mbox{position:relative;width:100%;max-width:520px;max-height:85vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.mbox h3{margin:0 0 2px;padding-right:32px}
+.mbox .mtag{font-size:.8rem;color:var(--pink);margin:0 0 10px}
+.mbox ol{padding-left:22px;margin:8px 0 12px}.mbox li{margin:8px 0;overflow-wrap:anywhere}
+.mbox .mnote{font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+.mclose{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:0;background:var(--card2);color:var(--text);font-size:1rem;cursor:pointer;padding:0}
+.mgo{display:inline-block;margin-top:6px;background:var(--pink);color:#fff;text-decoration:none;border-radius:999px;padding:8px 18px;font-weight:600}
+.cw.in{animation:cardIn .5s ease backwards;animation-delay:calc(var(--i,0)*40ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.cw.in{animation:none}.logo-wrap::before,.logo-wrap::after{display:none}}
+.totop{position:fixed;right:18px;bottom:18px;z-index:5;width:44px;height:44px;border-radius:50%;border:0;background:var(--pink);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .25s,transform .25s,filter .15s;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.totop.show{opacity:1;transform:none;pointer-events:auto}
+.totop:hover{filter:brightness(1.1)}
+.suggest,.soc,.theme,.lang button,nav button,.filters button,.btns a,.card{transition:transform .12s ease,filter .15s,border-color .15s}
+.suggest:active,.soc:active,.theme:active,.lang button:active,nav button:active,.filters button:active,.btns a:active{transform:scale(.94)}
+.totop.show:active{transform:scale(.92)}
+.card:active{transform:translateX(3px) scale(.98)}
+code,.guide li{overflow-wrap:anywhere}
+@media (max-width:560px){
+  header{padding:64px 12px 12px}
+  h1{font-size:1.55rem}
+  .lang,.theme{top:12px}.lang{right:12px}.theme{left:12px}
+  main{padding:0 12px 32px}
+  section{padding:16px}
+  .cards{grid-template-columns:1fr}
+  .fwrap{gap:28px}
+  footer{padding:20px 12px 28px}
+  .toast{max-width:90vw;text-align:center}
+  .totop{right:12px;bottom:12px}
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
 header{padding:28px 16px 16px;text-align:center;position:relative}
-h1{margin:0;font-size:2rem}h1 span{color:var(--pink)}
+h1{margin:0;font-size:2rem;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}h1 span{color:var(--pink)}
+.logo{width:40px;height:40px}
 header p{margin:4px 0 0;color:var(--muted)}
 .lang{position:absolute;top:16px;right:16px;display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .lang button{background:var(--card);color:var(--muted);border:0;padding:6px 12px;cursor:pointer;font:inherit;font-size:.85rem;font-weight:600}
@@ -25,7 +93,7 @@ nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:0 16px 16
 nav button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit}
 nav button.active{background:var(--pink);border-color:var(--pink);color:#fff;font-weight:600}
 main{max-width:760px;margin:0 auto;padding:0 16px 48px}
-section{display:none;background:var(--card);border-radius:16px;padding:20px}
+section{display:none;background:var(--card);background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:16px;padding:20px}
 section.active{display:block}
 .guide ol{padding-left:22px}.guide li{margin:10px 0}
 .guide a{color:var(--blue)}
@@ -43,6 +111,15 @@ h2{margin:0 0 4px}.sub{color:var(--muted);margin:0 0 16px}
 .filters button.on{border-color:var(--blue);color:var(--blue)}
 #c-search{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:10px 16px;font:inherit}
 #c-search:focus{outline:2px solid var(--pink)}
+.srow{display:flex;gap:8px;flex-wrap:wrap}.srow #c-search{flex:1 1 220px;width:auto}
+#c-sort{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:10px 14px;font:inherit;cursor:pointer}
+#c-sort:focus{outline:2px solid var(--pink)}
+.cnt{color:var(--pink);font-size:.9rem;font-weight:600;margin:2px 0 0}
+.newb{margin-left:8px;font-size:.68rem;font-weight:700;color:#fff;background:var(--pink);border-radius:999px;padding:1px 8px;text-transform:uppercase;letter-spacing:.03em}
+.fbtn{position:absolute;top:50%;right:44px;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:.85rem;line-height:1;cursor:pointer;padding:0;transition:color .15s,background .15s,border-color .15s,transform .12s}
+.fbtn:hover{color:#e5262f;border-color:#e5262f}
+.fbtn.on{color:#fff;background:#e5262f;border-color:#e5262f}
+.fbtn:active{transform:translateY(-50%) scale(.9)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
 .card{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:999px 16px 16px 999px;padding:10px 16px 10px 10px;color:var(--text);text-decoration:none;border:1px solid transparent;transition:transform .15s}
 .card:hover{border-color:var(--c);transform:translateX(3px)}
@@ -54,14 +131,33 @@ h2{margin:0 0 4px}.sub{color:var(--muted);margin:0 0 16px}
 .card b{display:block}
 .card p{margin:2px 0 4px;color:var(--muted);font-size:.85rem;line-height:1.3}
 .tag{font-size:.72rem;color:var(--c)}
-footer{text-align:center;color:var(--muted);padding:0 16px 32px;font-size:.85rem}
+:root[data-theme="light"] .tag{color:color-mix(in srgb,var(--c) 50%,#2a2133);font-weight:600}
+footer{max-width:760px;margin:0 auto;padding:24px 16px 32px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+.fwrap{display:flex;gap:56px;flex-wrap:wrap;margin-bottom:20px}
+.fcol h4{margin:0 0 10px;color:var(--text);font-size:1.05rem}
+.fcol a{display:block;color:var(--muted);text-decoration:none;margin:6px 0;font-size:.95rem}
+.fcol a:hover{color:var(--text)}
+.soc-row{display:flex;align-items:center;gap:10px;color:var(--text)}
+.soc{width:50px;height:50px;border-radius:50%;border:0;background:#5865f2;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.soc svg{width:26px;height:26px;fill:#fff}
+.fcol a.soc{display:flex;margin:0;text-decoration:none}
+.soc.tg{background:#229ed9}
+.soc.donate{background:#fff}
+.soc.donate svg{fill:#e5262f}
+.soc:hover{filter:brightness(1.12)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--pink);color:#fff;border-radius:999px;padding:8px 18px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+#privacy p{margin:6px 0 0}
 </style>
 </head>
 <body>
+<canvas id="petals" aria-hidden="true"></canvas>
 <header>
+  <button class="theme" id="theme-btn" type="button"></button>
   <div class="lang"><button data-l="ru">RU</button><button data-l="en">EN</button></div>
-  <h1><span>osu!</span> <span id="t-title" style="color:inherit"></span></h1>
+  <h1><span class="logo-wrap"><img class="logo" src="favicon.svg" alt="" width="40" height="40"></span><span>osu!</span> <span id="t-title" style="color:inherit"></span></h1>
   <p id="t-sub"></p>
+  <p class="cnt" id="t-count"></p>
 </header>
 <nav id="nav">
   <button data-t="cat" id="n-cat"></button>
@@ -89,12 +185,64 @@ footer{text-align:center;color:var(--muted);padding:0 16px 32px;font-size:.85rem
 <section id="cat">
   <h2 id="t-h2"></h2>
   <p class="sub" id="t-note"></p>
-  <input type="search" id="c-search">
+  <div class="srow"><input type="search" id="c-search"><select id="c-sort"></select></div>
   <div class="filters" id="c-filter"></div>
   <div class="cards" id="c-list"></div>
 </section>
+<section id="faq" class="guide">
+  <h2 id="fq-h2"></h2>
+  <p class="sub" id="fq-sub"></p>
+  <div id="fq-list"></div>
+</section>
+<section id="privacy" class="guide">
+  <h2 id="p-h2"></h2>
+  <p class="sub" id="p-upd"></p>
+  <div id="p-body"></div>
+</section>
 </main>
-<footer id="t-foot"></footer>
+<footer>
+  <div class="fwrap">
+    <div class="fcol">
+      <h4 id="f-about"></h4>
+      <a href="#" data-go="cat" id="f-cat"></a>
+      <a href="#" data-go="guide" id="f-guide"></a>
+      <a href="#" data-go="faq" id="f-faq"></a>
+      <a href="#follow" id="f-contacts"></a>
+      <a href="#" data-go="privacy" id="f-privacy"></a>
+    </div>
+    <div class="fcol" id="follow">
+      <h4 id="f-follow"></h4>
+      <div class="soc-row">
+        <a class="soc tg" href="https://t.me/SONIX871" target="_blank" rel="noopener noreferrer" title="Telegram: @SONIX871" aria-label="Telegram: @SONIX871">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        </a>
+        <a class="soc tg" href="https://t.me/Nexxyy67" target="_blank" rel="noopener noreferrer" title="Telegram: @Nexxyy67" aria-label="Telegram: @Nexxyy67">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        </a>
+        <button class="soc" id="f-dc" title="Discord: nexxy34" aria-label="Discord: nexxy34">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+        </button>
+        <a class="soc donate" id="f-don" href="https://dalink.to/nexxy33" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </a>
+      </div>
+      <button class="suggest" id="suggest" type="button" style="margin-top:16px"></button>
+    </div>
+  </div>
+  <p id="t-foot"></p>
+</footer>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="mbox">
+    <button class="mclose" id="m-close" type="button" aria-label="Close">✕</button>
+    <h3 id="m-title"></h3>
+    <p class="mtag" id="m-tag"></p>
+    <ol id="m-steps"></ol>
+    <a class="mgo" id="m-go" target="_blank" rel="noopener noreferrer"></a>
+    <p class="mnote" id="m-note"></p>
+  </div>
+</div>
+<button class="totop" id="totop" type="button" aria-label="Back to top">↑</button>
+<div class="toast" id="toast"></div>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -186,7 +334,7 @@ const tools = [
 
   ['osu!collector', 'Пользовательские коллекции карт', 'Community-made beatmap collections', 'maps', 'https://osucollector.com/'],
   ['Collection Manager', 'Управление коллекциями карт в osu!', 'Manage your osu! beatmap collections', 'maps', 'https://github.com/Piotrekol/CollectionManager'],
-  ['Collection Helper', 'Помощник для работы с коллекциями', 'A helper for working with collections', 'maps', 'https://github.com/nzbasic/Collection-Helper'],
+  ['Collection Helper', 'Менеджер коллекций (проект в архиве, лучше Collection Manager)', 'Collection manager (archived project, Collection Manager is recommended)', 'maps', 'https://github.com/nzbasic/Collection-Helper'],
   ['osu-pps', 'Поиск «фармилок» — карт, выгодных по PP', 'Find PP farm maps', 'maps', 'https://osu-pps.com/#/osu/maps'],
   ['osu!farmer', 'Подбор карт для фарма PP', 'Map picks for PP farming', 'maps', 'https://www.osufarmer.com/'],
   ['Tillerino', 'Бот в osu! для подбора карт под фарм', 'In-game bot that recommends maps to farm', 'maps', 'https://osu.ppy.sh/users/2070907'],
@@ -194,7 +342,7 @@ const tools = [
 
   ['Score Inspector', 'Подробная статистика скоров и профиля', 'Detailed score and profile statistics', 'stats', 'https://github.com/darkchii/score-inspector'],
   ['osuplus', 'Скрипт с доп. функциями для сайта osu! (см. вкладку «osuplus — гайд»)', 'Userscript with extra features for the osu! website (see the "osuplus guide" tab)', 'stats', 'https://osu.ppy.sh/community/forums/topics/408541?n=1'],
-  ['osu! expert+', 'Дополнительная статистика и анализ', 'Extra statistics and analysis', 'stats', 'https://github.com/inix1257'],
+  ['osu! expert+', 'Дополнительная статистика и анализ', 'Extra statistics and analysis', 'stats', 'https://github.com/inix1257/osu_expertplus'],
   ['osu!chan', 'Сайт со статистикой игроков osu!', 'Player statistics site for osu!', 'stats', 'https://osuchan.syrin.me/'],
   ['osu!skills', 'Оценка навыков игрока', 'Player skill evaluation', 'stats', 'https://osuskills.com/'],
   ['circle-tracker', 'Запись твоих игр в документ и анализ', 'Records your plays to a document for analysis', 'stats', 'https://github.com/FunOrange/circle-tracker'],
@@ -220,24 +368,262 @@ const tools = [
 ];
 const colors = ['#ff66aa', '#66ccff', '#b3e86f', '#ffd166', '#c792ff', '#ff8a5c'];
 
+// Мини-гайды: название -> { ru: [шаги], en: [шаги] }
+const GUIDES = {
+  'skins.osuck': {
+    ru: ["Открой сайт и выбери скин в каталоге.", "Нажми кнопку скачивания: загрузится файл .osk.", "Дважды щёлкни по файлу .osk, и osu! сам установит скин.", "В osu! открой настройки, раздел Skin, и выбери установленный скин."],
+    en: ["Open the site and pick a skin from the catalog.", "Click the download button to get an .osk file.", "Double-click the .osk file and osu! will install the skin.", "In osu! open Options, Skin section, and select the installed skin."]
+  },
+  'osu! skins': {
+    ru: ["Открой сайт и выбери скин в каталоге.", "Скачай файл скина (.osk).", "Дважды щёлкни по файлу, чтобы osu! установил скин.", "Выбери скин в настройках osu!, раздел Skin."],
+    en: ["Open the site and pick a skin from the catalog.", "Download the skin file (.osk).", "Double-click it so osu! installs the skin.", "Select the skin in osu! Options, Skin section."]
+  },
+  'skinhub': {
+    ru: ["Открой репозиторий и найди игрока или скин в списке.", "Нажми на название файла или картинку, чтобы скачать скин.", "Открой скачанный файл .osk двойным щелчком, и osu! установит его.", "Примечание: по данным репозитория, приём новых скинов в архив закрыт с 23.01.2024."],
+    en: ["Open the repository and find a player or skin in the list.", "Click the file name or the image to download the skin.", "Double-click the downloaded .osk file and osu! will install it.", "Note: according to the repository, new skin submissions have been closed since 23.01.2024."]
+  },
+  'McOsu': {
+    ru: ["Установи McOsu из Steam.", "При первом запуске укажи папку с твоим osu!: карты берутся оттуда.", "Выбери карту и играй. Скины и параметры настраиваются в меню настроек."],
+    en: ["Install McOsu from Steam.", "On first launch point it to your osu! folder: maps are loaded from there.", "Pick a map and play. Skins and options are in the settings menu."]
+  },
+  'neomod': {
+    ru: ["Нажми Download на сайте (Windows или Linux) или открой More downloads.", "Либо сыграй онлайн по ссылке Play online.", "Подробности установки и запуска смотри на странице загрузок или в сообществе проекта."],
+    en: ["Click Download on the site (Windows or Linux) or open More downloads.", "Or play in the browser via Play online.", "See the downloads page or the project's community for install and launch details."]
+  },
+  'danser': {
+    ru: ["Скачай последний релиз со страницы Releases на GitHub и распакуй.", "Запусти графический лаунчер danser-launcher.", "Выбери карту и реплей, настрой качество и запусти запись, чтобы получить видео.", "Если программа попросит, укажи папку с твоим osu!."],
+    en: ["Download the latest release from the GitHub Releases page and unpack it.", "Run the graphical danser-launcher.", "Choose a map and a replay, set the quality and start recording to get a video.", "If asked, point it to your osu! folder."]
+  },
+  'o!rdr': {
+    ru: ["Открой сайт и загрузи файл реплея (.osr).", "Выбери скин и настройки видео.", "Отправь реплей на рендер и дождись ссылки на готовое видео."],
+    en: ["Open the site and upload a replay file (.osr).", "Choose a skin and video settings.", "Submit the replay for rendering and wait for the link to the finished video."]
+  },
+  'rewind': {
+    ru: ["Скачай релиз со страницы Releases на GitHub и запусти программу.", "При первом запуске укажи папку с osu!.", "Открой реплей, чтобы смотреть и анализировать его."],
+    en: ["Download a release from the GitHub Releases page and run the app.", "On first launch point it to your osu! folder.", "Open a replay to watch and analyze it."]
+  },
+  'osu!collector': {
+    ru: ["Открой сайт и найди коллекцию карт.", "Нажми кнопку скачивания коллекции: карты скачаются и добавятся в osu!.", "Если сайт предложит установить их приложение, следуй подсказкам на сайте."],
+    en: ["Open the site and find a beatmap collection.", "Click the collection download button: the maps get downloaded and added to osu!.", "If the site offers its desktop app, follow the on-site prompts."]
+  },
+  'Collection Manager': {
+    ru: ["Скачай релиз со страницы Releases на GitHub и установи программу.", "Закрой osu! и запусти программу: она найдёт твои коллекции.", "Создавай, объединяй и редактируй коллекции. Перед правками сделай резервную копию."],
+    en: ["Download a release from the GitHub Releases page and install the app.", "Close osu! and start the app: it will find your collections.", "Create, merge and edit collections. Make a backup before editing."]
+  },
+  'Collection Helper': {
+    ru: ["Проект заархивирован: по README автор советует использовать Collection Manager.", "Если всё же нужен: установи osu! и запусти его хотя бы один раз.", "Скачай релиз с GitHub Releases и запусти установщик."],
+    en: ["The project is archived: the README recommends using Collection Manager instead.", "If you still need it: install osu! and run it at least once.", "Download a release from GitHub Releases and run the installer."]
+  },
+  'osu-pps': {
+    ru: ["Открой сайт: это каталог карт для фарма PP.", "Выбери режим игры и фильтры (PP, длина, моды), чтобы найти подходящие карты.", "Для персональных подсказок введи свой ник osu!, если сайт предложит."],
+    en: ["Open the site: it is a catalog of PP farm maps.", "Pick the game mode and filters (PP, length, mods) to find suitable maps.", "For personal picks enter your osu! username if the site offers it."]
+  },
+  'osu!farmer': {
+    ru: ["Нажми Log in with osu! и подключи свой аккаунт.", "После этого просматривай карты для фарма PP.", "Подробности смотри по ссылке Learn more на сайте."],
+    en: ["Click Log in with osu! and connect your account.", "Then browse the PP farm maps.", "See the Learn more link on the site for details."]
+  },
+  'Tillerino': {
+    ru: ["Открой osu! и найди игрока Tillerino (в чате или личным сообщением).", "Отправь команду !r, и бот предложит карту под твой уровень.", "Команда !help покажет остальные возможности бота."],
+    en: ["Open osu! and find the player Tillerino (in chat or by direct message).", "Send the command !r and the bot will recommend a map for your level.", "The !help command lists the bot's other features."]
+  },
+  'omdb': {
+    ru: ["По желанию нажми log in и войди через аккаунт osu!.", "Открой меню карт: latest, random, а также разделы charts и lists.", "На странице набора карт смотри оценку и комментарии игроков."],
+    en: ["Optionally click log in and sign in with your osu! account.", "Open the maps menu: latest, random, plus the charts and lists sections.", "On a mapset page see the rating and player comments."]
+  },
+  'Score Inspector': {
+    ru: ["Открой репозиторий и прочитай README: там есть описание функций и ссылка на работающий сайт.", "Дальше следуй инструкциям автора."],
+    en: ["Open the repository and read the README for the feature list and a link to the live site.", "Then follow the author's instructions."]
+  },
+  'osuplus': {
+    ru: ["Подробный пошаговый гайд по установке есть на вкладке «osuplus — гайд» этого сайта."],
+    en: ["A detailed step-by-step install guide is on this site's \"osuplus guide\" tab."]
+  },
+  'osu! expert+': {
+    ru: ["Открой репозиторий osu_expertplus на GitHub.", "Описание и установка должны быть в README проекта; на странице автора общего описания нет."],
+    en: ["Open the osu_expertplus repository on GitHub.", "The description and installation should be in the project's README; the author's page has no general description."]
+  },
+  'osu!skills': {
+    ru: ["Нажми кнопку Show my skills! и найди свой профиль.", "Смотри свои очки навыков (Skill Points) и звания.", "Дополнительно есть рейтинги (Rankings), сравнение двух игроков (Versus), калькулятор и тренировки."],
+    en: ["Click the Show my skills! button and find your profile.", "Check your Skill Points and titles.", "There are also Rankings, Versus (compare two players), a calculator and training tools."]
+  },
+  'circle-tracker': {
+    ru: ["Скачай программу со страницы репозитория (Releases) и запусти рядом с osu!.", "Играй как обычно: программа записывает твои игры в документ.", "Открой записи и анализируй свой прогресс. Принцип работы автор объяснил в своём видео."],
+    en: ["Download the app from the repository (Releases) and run it next to osu!.", "Play as usual: the app records your plays into a document.", "Open the records and analyze your progress. The author explains how it works in his video."]
+  },
+  'Mutualify': {
+    ru: ["Войди на сайте через аккаунт osu!.", "Открой раздел с мутуалами (взаимные подписки) и смотри список."],
+    en: ["Sign in on the site with your osu! account.", "Open the mutuals section (mutual follows) and browse the list."]
+  },
+  'osucad': {
+    ru: ["Открой сайт: редактор работает в браузере, ничего ставить не нужно.", "Создай новую карту или открой существующую и начни редактировать."],
+    en: ["Open the site: the editor runs in the browser, nothing to install.", "Create a new map or open an existing one and start editing."]
+  },
+  'o!mt (Mapping Tools)': {
+    ru: ["Скачай установщик по ссылке на сайте.", "Установи и запусти программу, затем открой карту в редакторе osu!.", "Выбери нужный инструмент из набора и примени его."],
+    en: ["Download the installer via the link on the site.", "Install and run the app, then open a map in the osu! editor.", "Pick the tool you need from the set and apply it."]
+  },
+  'BN Website': {
+    ru: ["Открой сайт и войди через аккаунт osu!.", "Смотри заявки, оценки и данные номинаторов."],
+    en: ["Open the site and sign in with your osu! account.", "Browse applications, evaluations and nominator data."]
+  },
+  'osumod': {
+    ru: ["Открой сайт и войди через аккаунт osu!, если потребуется.", "Выбери очередь модинга и отправь свою карту на проверку или возьми чужую."],
+    en: ["Open the site and sign in with your osu! account if required.", "Choose a modding queue and submit your map for a check, or pick someone else's."]
+  },
+  'osu! trainer': {
+    ru: ["Скачай программу со страницы Releases на GitHub и запусти её вместе с osu!.", "Выбери карту в игре и измени BPM, AR, CS, OD или HP.", "Создай изменённую копию карты и сыграй её в osu!."],
+    en: ["Download the app from the GitHub Releases page and run it together with osu!.", "Select a map in the game and change BPM, AR, CS, OD or HP.", "Create the modified copy of the map and play it in osu!."]
+  },
+  'tosu': {
+    ru: ["Скачай tosu с сайта и запусти при открытом osu!.", "tosu читает данные игры и запускает локальный сервер для оверлеев.", "В OBS добавь источник Браузер с адресом оверлея из списка на сайте."],
+    en: ["Download tosu from the site and run it while osu! is open.", "tosu reads game data and starts a local server for overlays.", "In OBS add a Browser source with the overlay address from the site's list."]
+  },
+  'Ronnia bot': {
+    ru: ["Открой сайт и войди через Twitch (и osu!, если попросит).", "Подключи бота к своему каналу в настройках.", "Зрители присылают ссылки на карты в чат, а бот передаёт их тебе в osu!."],
+    en: ["Open the site and sign in with Twitch (and osu! if asked).", "Connect the bot to your channel in the settings.", "Viewers post beatmap links in chat and the bot forwards them to you in osu!."]
+  },
+  'osu-draft': {
+    ru: ["Открой сайт и посмотри, какие режимы драфта он предлагает.", "Примечание: при моей проверке сайт не открылся, поэтому гайд общий."],
+    en: ["Open the site and see which draft modes it offers.", "Note: the site did not open during my check, so this guide is generic."]
+  },
+  'osu team sheets': {
+    ru: ["Нажми Login with osu! и войди через аккаунт osu!.", "Создавай и редактируй таблицы команд для турнира.", "Подробности смотри в Discord-сервере проекта (ссылка на сайте)."],
+    en: ["Click Login with osu! and sign in with your osu! account.", "Create and edit team sheets for your tournament.", "See the project's Discord server (link on the site) for details."]
+  },
+  'osu! gacha': {
+    ru: ["Открой сайт и войди через osu!, если попросит.", "Открывай карточки и собирай игроков osu!."],
+    en: ["Open the site and sign in with osu! if asked.", "Open cards and collect osu! players."]
+  },
+  'guessu': {
+    ru: ["Открой сайт и начни игру.", "Угадывай игрока osu!."],
+    en: ["Open the site and start the game.", "Guess the osu! player."]
+  },
+  'osuguessr': {
+    ru: ["Открой режим Background.", "Угадай карту по фону и отправь ответ."],
+    en: ["Open the Background mode.", "Guess the beatmap from its background and submit your answer."]
+  },
+  'RankGuessr': {
+    ru: ["Открой сайт и начни игру.", "Угадывай ранг и набирай очки."],
+    en: ["Open the site and start the game.", "Guess the rank and earn points."]
+  },
+  'osu! Music Quiz (Luscent)': {
+    ru: ["Открой сайт и начни викторину.", "Угадывай песни из карт osu!."],
+    en: ["Open the site and start the quiz.", "Guess songs from osu! beatmaps."]
+  },
+  'osu! Music Quiz (HyperBCS)': {
+    ru: ["Открой сайт и начни викторину.", "Угадывай песни из карт osu!."],
+    en: ["Open the site and start the quiz.", "Guess songs from osu! beatmaps."]
+  }
+};
+const GENERIC_GUIDE = {
+  ru: ["Открой сайт или репозиторий по кнопке ниже.", "Прочитай описание на главной странице или README: там есть инструкции."],
+  en: ["Open the site or repository with the button below.", "Read the description on the home page or README for instructions."]
+};
+
+Object.assign(I18N.ru, {
+  fAbout: 'О сайте', fCat: 'Каталог', fGuide: 'osuplus — гайд', fContacts: 'Контакты', fPrivacy: 'Политика конфиденциальности',
+  fFollow: 'Мы в сети', copied: 'Discord-ник скопирован: nexxy34', donate: 'Поддержать автора (донат)',
+  suggest: '+ Предложить сайт', suggestMsg: 'Напиши в Discord: nexxy34 (ник скопирован)', themeLabel: 'Сменить тему', top: 'Наверх',
+  tabFaq: 'FAQ', fFaq: 'FAQ', fqH2: 'Частые вопросы', fqSub: 'Короткие ответы на то, о чём спрашивают чаще всего.',
+  fqMore: 'Не нашёл ответ или хочешь предложить сайт? Напиши в Discord: nexxy34 (кнопка ниже скопирует ник).',
+  faq: [
+    ['Что это за сайт?', 'Это неофициальный каталог полезных программ и сайтов для osu!: скины, реплеи, коллекции карт, статистика, инструменты для мапперов и развлечения. Всё собрано в одном месте, чтобы не искать по разным ссылкам.'],
+    ['Как пользоваться каталогом?', 'Выбери категорию или найди инструмент через поиск. Нажми на карточку, и откроется сайт автора. Кнопка «?» справа на карточке показывает короткий гайд, с чего начать.'],
+    ['Этот сайт связан с osu! или ppy?', 'Нет. Это независимый проект, он не связан с ppy Pty Ltd, а osu! — торговая марка ppy.'],
+    ['Как предложить свой сайт или инструмент?', 'Нажми кнопку «+ Предложить сайт» в нижней части страницы (в футере): ник Discord <b>nexxy34</b> скопируется, и ты сможешь написать мне. Также можно написать в Telegram: <a href="https://t.me/SONIX871" target="_blank" rel="noopener noreferrer">@SONIX871</a>.'],
+    ['Ссылка не открывается. Что делать?', 'Все сайты принадлежат их авторам, и иногда они закрываются или меняют адрес. Напиши мне в Discord или Telegram, и я исправлю ссылку или уберу её из каталога.'],
+    ['Безопасно ли пользоваться этими сайтами?', 'Мы только даём ссылки и не отвечаем за чужие сайты и программы. Не вводи пароль от osu! на сторонних страницах: входи только через официальное окно авторизации osu!. Секретные ключи (Client Secret) вводи только в проверенное расширение на своём устройстве.'],
+    ['Что такое osuplus и зачем режим разработчика?', 'osuplus — пользовательский скрипт, который добавляет функции на сайт osu!. Подробная установка описана на вкладке «osuplus — гайд», там же как включить режим разработчика в браузере.'],
+    ['Какие данные собирает сайт?', 'На сайте нет регистрации, форм и рекламы. Подробности в <a href="#" data-go="privacy">политике конфиденциальности</a>.'],
+    ['Как поменять язык или тему?', 'Переключатель языка RU / EN находится вверху справа, а кнопка темы ☀️ / 🌙 вверху слева. Выбор запоминается в браузере.'],
+    ['Как поддержать автора?', 'Нажми красное сердечко в нижней части страницы: оно ведёт на страницу доната. Это добровольно, спасибо!']
+  ],
+  favs: 'Избранное', favAdd: 'Добавить в избранное', favDel: 'Убрать из избранного', newLabel: 'Новое',
+  sortDef: 'По умолчанию', sortAz: 'По алфавиту', sortNew: 'Сначала новые', count: 'сайтов и программ в каталоге',
+  gbtn: 'Мини-гайд', gOpen: 'Открыть сайт', gClose: 'Закрыть', gHow: 'Как начать',
+  gNote: 'Кратко и по возможности по данным с самих сайтов. Точные детали смотри на странице инструмента.',
+  pH2: 'Политика конфиденциальности', pUpd: 'Последнее обновление: 19 октября 2026',
+  pBody: [
+    ['Общие сведения', 'Сайт osutools.ru — неофициальный каталог программ и сайтов для osu!. На сайте нет регистрации, форм, комментариев и рекламы, и мы не собираем персональные данные намеренно.'],
+    ['Какие данные обрабатываются', 'Как и любой сайт, сервер автоматически записывает технические журналы (логи): IP-адрес, дату и время запроса, адрес страницы и тип браузера. Они нужны для безопасности и защиты от злоупотреблений и хранятся ограниченное время. Мы не используем их для рекламы и не передаём третьим лицам, кроме случаев, предусмотренных законом. Из этих журналов на собственном сервере формируется обезличенная статистика посещений (число визитов, популярные страницы, страны) без сторонних счётчиков и cookie.'],
+    ['Cookie и локальное хранилище', 'Сайт не использует cookie и системы аналитики. В локальном хранилище браузера сохраняется только выбранный язык интерфейса.'],
+    ['Внешние ссылки', 'Сайт содержит ссылки на сторонние сайты и программы. Мы не управляем ими и не отвечаем за их содержание и политику конфиденциальности.'],
+    ['Пароли и ключи', 'Сайт никогда не просит вводить пароли, ключи osu!API или другие секретные данные. Если в гайде упоминаются ключи (Client ID и Client Secret), они вводятся только в стороннее расширение на твоём устройстве, а не на нашем сайте.'],
+    ['Хостинг', 'Сайт размещён на арендованном сервере в Хельсинки (Финляндия).'],
+    ['Изменения и контакты', 'Политика может обновляться, актуальная версия всегда доступна на этой странице. Вопросы можно задать в Discord: nexxy34.']
+  ]
+});
+Object.assign(I18N.en, {
+  fAbout: 'About', fCat: 'Catalog', fGuide: 'osuplus guide', fContacts: 'Contacts', fPrivacy: 'Privacy Policy',
+  fFollow: 'Follow us', copied: 'Discord username copied: nexxy34', donate: 'Support the author (donate)',
+  suggest: '+ Suggest a site', suggestMsg: 'Message me on Discord: nexxy34 (username copied)', themeLabel: 'Toggle theme', top: 'Back to top',
+  tabFaq: 'FAQ', fFaq: 'FAQ', fqH2: 'Frequently asked questions', fqSub: 'Short answers to the things people ask most often.',
+  fqMore: 'Didn\'t find an answer or want to suggest a site? Message me on Discord: nexxy34 (the button below copies the username).',
+  faq: [
+    ['What is this site?', 'It is an unofficial catalog of useful programs and websites for osu!: skins, replays, beatmap collections, statistics, mapper tools and fun. Everything is in one place so you don\'t have to hunt for links.'],
+    ['How do I use the catalog?', 'Pick a category or search for a tool. Click a card to open the author\'s site. The "?" button on a card shows a short guide on how to get started.'],
+    ['Is this site related to osu! or ppy?', 'No. It is an independent project, not affiliated with ppy Pty Ltd, and osu! is a trademark of ppy.'],
+    ['How do I suggest my own site or tool?', 'Click the "+ Suggest a site" button in the page footer: the Discord username <b>nexxy34</b> gets copied so you can message me. You can also write on Telegram: <a href="https://t.me/SONIX871" target="_blank" rel="noopener noreferrer">@SONIX871</a>.'],
+    ['A link does not open. What should I do?', 'All sites belong to their authors and sometimes they shut down or change address. Message me on Discord or Telegram and I will fix the link or remove it from the catalog.'],
+    ['Is it safe to use these sites?', 'We only provide links and are not responsible for third-party sites and programs. Never enter your osu! password on third-party pages: sign in only through the official osu! authorization window. Enter secret keys (Client Secret) only into a trusted extension on your own device.'],
+    ['What is osuplus and why Developer mode?', 'osuplus is a userscript that adds features to the osu! website. Detailed installation is on the "osuplus guide" tab, which also explains how to enable Developer mode in your browser.'],
+    ['What data does the site collect?', 'The site has no registration, forms or ads. Details are in the <a href="#" data-go="privacy">privacy policy</a>.'],
+    ['How do I change the language or theme?', 'The RU / EN switch is at the top right and the ☀️ / 🌙 theme button is at the top left. Your choice is remembered in the browser.'],
+    ['How can I support the author?', 'Click the red heart at the bottom of the page: it opens the donation page. It is voluntary, thank you!']
+  ],
+  favs: 'Favorites', favAdd: 'Add to favorites', favDel: 'Remove from favorites', newLabel: 'New',
+  sortDef: 'Default order', sortAz: 'Alphabetical', sortNew: 'New first', count: 'sites and programs in the catalog',
+  gbtn: 'Mini guide', gOpen: 'Open site', gClose: 'Close', gHow: 'How to start',
+  gNote: 'Brief and, where possible, based on the sites themselves. Check the tool\'s own page for exact details.',
+  pH2: 'Privacy Policy', pUpd: 'Last updated: October 19, 2026',
+  pBody: [
+    ['General', 'osutools.ru is an unofficial catalog of programs and websites for osu!. The site has no registration, forms, comments or ads, and we do not intentionally collect personal data.'],
+    ['What data is processed', 'Like any website, the server automatically records technical logs: IP address, date and time of the request, page address and browser type. They are used for security and abuse protection and kept for a limited time. We do not use them for advertising and do not share them with third parties, except where required by law. These logs are used on our own server to produce anonymous visit statistics (number of visits, popular pages, countries) without third-party counters or cookies.'],
+    ['Cookies and local storage', 'The site does not use cookies or analytics. Your browser\'s local storage only keeps the interface language you selected.'],
+    ['External links', 'The site links to third-party websites and programs. We do not control them and are not responsible for their content or privacy policies.'],
+    ['Passwords and keys', 'The site never asks you to enter passwords, osu! API keys or other secrets. If a guide mentions keys (Client ID and Client Secret), they are entered only into a third-party extension on your own device, not on our site.'],
+    ['Hosting', 'The site is hosted on a rented server in Helsinki, Finland.'],
+    ['Changes and contact', 'This policy may be updated; the current version is always on this page. Questions can be sent on Discord: nexxy34.']
+  ]
+});
+
 let saved = null;
 try { saved = localStorage.getItem('lang'); } catch (e) {}
 let lang = saved in I18N ? saved : ((navigator.language || '').toLowerCase().startsWith('ru') ? 'ru' : 'en');
 let cFilter = 'all', cQuery = '';
-const TABS = ['cat', 'guide'];
-let tab = ['guide', 'dev'].includes(location.hash.slice(1)) ? 'guide' : 'cat';
+let animCards = true;
+let cSort = 'def';
+const NEW = new Set(['osuplus', 'osu!chan', 'BN Website', 'osumod', 'osu-draft', 'guessu', 'osuguessr']);
+let favs = new Set();
+try { favs = new Set(JSON.parse(localStorage.getItem('favs') || '[]')); } catch (e) {}
+const TABS = ['cat', 'guide', 'faq', 'privacy'];
+const h0 = location.hash.slice(1);
+let tab = ['privacy', 'faq'].includes(h0) ? h0 : ['guide', 'dev'].includes(h0) ? 'guide' : 'cat';
 function go(t){
   const toDev = t === 'dev';
   tab = toDev ? 'guide' : t;
-  try { history.replaceState(null, '', tab === 'cat' ? location.pathname : '#guide'); } catch (e) {}
+  try { history.replaceState(null, '', tab === 'cat' ? location.pathname : '#' + tab); } catch (e) {}
+  if (tab === 'cat') animCards = true;
   render();
   if (toDev) $('dev').scrollIntoView({ behavior: 'smooth' }); else window.scrollTo(0, 0);
 }
 
 function render(){
   const t = I18N[lang];
-  $('n-cat').textContent = t.tabCat; $('n-guide').textContent = t.tabGuide;  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.t === tab));
+  $('n-cat').textContent = t.tabCat; $('n-guide').textContent = t.tabGuide; $('f-faq').textContent = t.fFaq;  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.t === tab));
   TABS.forEach(k => $(k).classList.toggle('active', tab === k));
+  $('f-about').textContent = t.fAbout; $('f-cat').textContent = t.fCat; $('f-guide').textContent = t.fGuide;
+  $('f-contacts').textContent = t.fContacts; $('f-privacy').textContent = t.fPrivacy; $('f-follow').textContent = t.fFollow;
+  $('f-don').title = $('f-don').ariaLabel = t.donate;
+  $('suggest').textContent = t.suggest;
+  $('t-count').textContent = tools.length + ' ' + t.count;
+  $('c-sort').innerHTML = [['def', t.sortDef], ['az', t.sortAz], ['new', t.sortNew]].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  $('c-sort').value = cSort;
+  $('totop').title = $('totop').ariaLabel = t.top;
+  $('theme-btn').title = $('theme-btn').ariaLabel = t.themeLabel;
+  $('fq-h2').textContent = t.fqH2; $('fq-sub').textContent = t.fqSub;  $('fq-list').innerHTML = t.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${q}</summary><p>${a}</p></details>`).join('');
+  $('p-h2').textContent = t.pH2; $('p-upd').textContent = t.pUpd;
+  $('p-body').innerHTML = t.pBody.map(([h, p]) => `<h3>${h}</h3><p>${p}</p>`).join('');
   $('d-h2').textContent = t.dH2; $('d-intro').textContent = t.dIntro;
   $('d-bt').textContent = t.dBt;
   $('d-steps').innerHTML = t.dSteps.map(x => `<li>${x}</li>`).join('');
@@ -257,19 +643,22 @@ function render(){
   document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
 
   $('c-filter').innerHTML = '';
-  ['all', ...Object.keys(t.cats)].forEach(k => {
+  ['all', 'fav', ...Object.keys(t.cats)].forEach(k => {
     const b = document.createElement('button');
-    b.textContent = k === 'all' ? t.all : t.cats[k];
+    b.textContent = k === 'all' ? t.all : k === 'fav' ? `♥ ${t.favs} (${favs.size})` : t.cats[k];
     if (k === cFilter) b.className = 'on';
-    b.onclick = () => { cFilter = k; render(); };
+    b.onclick = () => { cFilter = k; animCards = true; render(); };
     $('c-filter').appendChild(b);
   });
 
   const q = cQuery.trim().toLowerCase(), li = lang === 'ru' ? 1 : 2;
-  const list = tools.filter(x => (cFilter === 'all' || x[3] === cFilter) && (!q || (x[0] + ' ' + x[li]).toLowerCase().includes(q)));
+  let list = tools.filter(x => (cFilter === 'all' || (cFilter === 'fav' ? favs.has(x[0]) : x[3] === cFilter)) && (!q || (x[0] + ' ' + x[li]).toLowerCase().includes(q)));
+  if (cSort === 'az') list = [...list].sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()));
+  else if (cSort === 'new') list = [...list].sort((a, b) => NEW.has(b[0]) - NEW.has(a[0]));
   $('c-list').innerHTML = list.map((x, i) =>
-    `<a class="card" href="${x[4]}" target="_blank" rel="noopener noreferrer" style="--c:${colors[i % colors.length]}"><span class="hc">${i + 1}</span><span class="ct"><b>${x[0]}</b><p>${x[li]}</p><span class="tag">${t.cats[x[3]]}</span></span></a>`).join('')
+    `<div class="cw${animCards ? ' in' : ''}" style="--c:${colors[i % colors.length]};--i:${Math.min(i, 14)}"><a class="card" href="${x[4]}" target="_blank" rel="noopener noreferrer"><span class="hc">${i + 1}</span><span class="ct"><b>${x[0]}</b><p>${x[li]}</p><span class="tag">${t.cats[x[3]]}</span>${NEW.has(x[0]) ? `<span class="newb">${t.newLabel}</span>` : ''}</span></a><button class="fbtn${favs.has(x[0]) ? ' on' : ''}" type="button" data-f="${tools.indexOf(x)}" title="${favs.has(x[0]) ? t.favDel : t.favAdd}" aria-pressed="${favs.has(x[0])}" aria-label="${favs.has(x[0]) ? t.favDel : t.favAdd}: ${x[0]}">♥</button><button class="gbtn" type="button" data-i="${tools.indexOf(x)}" title="${t.gbtn}" aria-label="${t.gbtn}: ${x[0]}">?</button></div>`).join('')
     || `<p class="sub">${t.none}</p>`;
+  animCards = false;
 }
 
 document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
@@ -283,7 +672,120 @@ document.addEventListener('click', e => {
   if (a) { e.preventDefault(); go(a.dataset.go); }
 });
 $('c-search').oninput = e => { cQuery = e.target.value; render(); };
+$('c-sort').onchange = e => { cSort = e.target.value; animCards = true; render(); };
+document.addEventListener('click', e => {
+  const b = e.target.closest('.fbtn');
+  if (!b) return;
+  e.preventDefault();
+  const x = tools[+b.dataset.f]; if (!x) return;
+  if (favs.has(x[0])) favs.delete(x[0]); else favs.add(x[0]);
+  try { localStorage.setItem('favs', JSON.stringify([...favs])); } catch (err) {}
+  render();
+});
+function copyDiscord(key){
+  try { navigator.clipboard.writeText('nexxy34'); } catch (e) {}
+  const el = $('toast'); el.textContent = I18N[lang][key]; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+$('f-dc').onclick = () => copyDiscord('copied');
+$('suggest').onclick = () => copyDiscord('suggestMsg');
+
+const root = document.documentElement;
+const themeIcon = () => $('theme-btn').textContent = root.dataset.theme === 'light' ? '🌙' : '☀️';
+$('theme-btn').onclick = () => {
+  root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+  themeIcon();
+};
+themeIcon();
 render();
+
+// ---- окно мини-гайда ----
+(function(){
+  const m = $('modal');
+  function open(i){
+    const x = tools[i]; if (!x) return;
+    const t = I18N[lang], g = (GUIDES[x[0]] || GENERIC_GUIDE)[lang] || GENERIC_GUIDE[lang];
+    $('m-title').textContent = x[0];
+    $('m-tag').textContent = t.gHow + ' · ' + t.cats[x[3]];
+    $('m-steps').innerHTML = g.map(s => `<li>${s}</li>`).join('');
+    $('m-go').href = x[4]; $('m-go').textContent = t.gOpen;
+    $('m-note').textContent = t.gNote;
+    $('m-close').setAttribute('aria-label', t.gClose);
+    m.classList.add('open');
+    $('m-close').focus();
+  }
+  const close = () => m.classList.remove('open');
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.gbtn');
+    if (b) { e.preventDefault(); open(+b.dataset.i); }
+  });
+  $('m-close').onclick = close;
+  m.addEventListener('click', e => { if (e.target === m) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+
+// ---- кнопка «наверх» ----
+(function(){
+  const b = $('totop');
+  const upd = () => b.classList.toggle('show', window.scrollY > 400);
+  window.addEventListener('scroll', upd, { passive: true });
+  b.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  upd();
+})();
+
+// ---- падающие лепестки сакуры ----
+(function(){
+  const cv = $('petals');
+  if (!cv || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) { if (cv) cv.remove(); return; }
+  const ctx = cv.getContext('2d');
+  let W = 0, H = 0, petals = [], last = 0;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function make(initial){
+    return {
+      x: rnd(0, W), y: initial ? rnd(-H, H) : rnd(-60, -10),
+      s: rnd(5, 11), vy: rnd(22, 48), sw: rnd(14, 38), ph: rnd(0, 6.28), fr: rnd(0.5, 1.4),
+      rot: rnd(0, 6.28), vr: rnd(-1.2, 1.2), a: rnd(0.45, 0.85)
+    };
+  }
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.max(14, Math.min(34, Math.round(W / 45)));
+    while (petals.length < n) petals.push(make(true));
+    petals.length = n;
+  }
+  function draw(p){
+    const light = document.documentElement.dataset.theme === 'light';
+    ctx.save();
+    ctx.translate(p.x + Math.sin(p.ph) * p.sw, p.y);
+    ctx.rotate(p.rot);
+    ctx.globalAlpha = p.a;
+    ctx.fillStyle = light ? '#f06fa5' : '#ffd3e4';
+    const s = p.s;
+    ctx.beginPath();
+    ctx.moveTo(0, -s);
+    ctx.bezierCurveTo(s * 0.95, -s * 0.55, s * 0.8, s * 0.65, 0, s);
+    ctx.bezierCurveTo(-s * 0.8, s * 0.65, -s * 0.95, -s * 0.55, 0, -s);
+    ctx.fill();
+    ctx.restore();
+  }
+  function frame(t){
+    const dt = Math.min((t - last) / 1000 || 0, 0.05); last = t;
+    ctx.clearRect(0, 0, W, H);
+    for (const p of petals) {
+      p.y += p.vy * dt; p.ph += p.fr * dt; p.rot += p.vr * dt;
+      if (p.y > H + 20) Object.assign(p, make(false));
+      draw(p);
+    }
+    requestAnimationFrame(frame);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
