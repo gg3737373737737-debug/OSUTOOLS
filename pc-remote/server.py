@@ -46,10 +46,37 @@ def load_config():
     if not cfg.get("port"):
         cfg["port"] = 8765
         changed = True
+    if not isinstance(cfg.get("deck"), list):
+        cfg["deck"] = default_deck()
+        changed = True
     if changed:
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(cfg, f, indent=2, ensure_ascii=False)
+        save_config(cfg)
     return cfg
+
+
+def save_config(cfg):
+    tmp = CONFIG_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, CONFIG_PATH)
+
+
+def default_deck():
+    win = platform.system() == "Windows"
+    b = lambda icon, label, color, type_, value: {
+        "id": secrets.token_hex(4), "icon": icon, "label": label,
+        "color": color, "type": type_, "value": value}
+    return [
+        b("📁", "Проводник", "#4f8cff", "hotkey", "win+e"),
+        b("🧮", "Калькулятор", "#7b61ff", "launch", "calc" if win else "gnome-calculator"),
+        b("📝", "Блокнот", "#3ecf8e", "launch", "notepad" if win else "gedit"),
+        b("📊", "Диспетчер", "#f5a623", "hotkey", "ctrl+shift+esc"),
+        b("✂️", "Скриншот", "#ff5a5f", "hotkey", "win+shift+s"),
+        b("🖥", "Рабочий стол", "#20242d", "hotkey", "win+d"),
+        b("▶️", "YouTube", "#ff0033", "url", "https://youtube.com"),
+        b("🎵", "Пауза", "#20242d", "hotkey", "play"),
+        b("🔇", "Без звука", "#20242d", "hotkey", "vol_mute"),
+    ]
 
 
 CFG = load_config()
@@ -163,15 +190,31 @@ if IS_WIN:
         if seq:
             _send(*seq)
 
-    VK = {"enter": 0x0D, "backspace": 0x08, "esc": 0x1B, "tab": 0x09,
+    VK = {"enter": 0x0D, "backspace": 0x08, "esc": 0x1B, "escape": 0x1B, "tab": 0x09,
           "space": 0x20, "left": 0x25, "up": 0x26, "right": 0x27, "down": 0x28,
-          "win": 0x5B, "alt": 0x12, "ctrl": 0x11, "shift": 0x10, "f4": 0x73,
-          "f5": 0x74, "f11": 0x7A, "delete": 0x2E, "d": 0x44,
+          "win": 0x5B, "alt": 0x12, "ctrl": 0x11, "control": 0x11, "shift": 0x10,
+          "delete": 0x2E, "del": 0x2E, "insert": 0x2D, "home": 0x24, "end": 0x23,
+          "pageup": 0x21, "pagedown": 0x22, "printscreen": 0x2C, "prtsc": 0x2C,
+          "capslock": 0x14, "menu": 0x5D, "pause": 0x13,
           "vol_mute": 0xAD, "vol_down": 0xAE, "vol_up": 0xAF,
-          "next": 0xB0, "prev": 0xB1, "play": 0xB3}
+          "next": 0xB0, "prev": 0xB1, "stop": 0xB2, "play": 0xB3,
+          "-": 0xBD, "=": 0xBB, "[": 0xDB, "]": 0xDD, ";": 0xBA, "'": 0xDE,
+          ",": 0xBC, ".": 0xBE, "/": 0xBF, "`": 0xC0, "\\": 0xDC}
+
+    def _vk(name):
+        name = name.strip().lower()
+        if name in VK:
+            return VK[name]
+        if len(name) == 1 and name.isascii() and name.isalnum():
+            return ord(name.upper())
+        if name.startswith("f") and name[1:].isdigit() and 1 <= int(name[1:]) <= 24:
+            return 0x70 + int(name[1:]) - 1
+        if name.startswith("num") and name[3:].isdigit() and len(name) == 4:
+            return 0x60 + int(name[3:])
+        raise ValueError(f"Неизвестная клавиша: {name}")
 
     def key(name):
-        parts = [VK[p] for p in name.split("+") if p in VK]
+        parts = [_vk(p) for p in name.split("+") if p.strip()]
         if parts:
             press_combo(parts)
 
@@ -239,7 +282,7 @@ elif IS_LINUX:
             return run(["pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle"])
         if name in ("play", "next", "prev"):
             return run(["playerctl", {"play": "play-pause", "next": "next", "prev": "previous"}[name]])
-        combo = "+".join(XKEYS.get(p, p) for p in name.split("+"))
+        combo = "+".join(XKEYS.get(p.strip().lower(), p.strip()) for p in name.split("+"))
         _xdo("key", combo)
 
     def _cpu_times():
@@ -314,6 +357,56 @@ def power(action, minutes=0):
         cmd = cmds.get(action)
         return run(cmd) if cmd else False
     return False
+
+
+DECK_TYPES = {"hotkey", "launch", "url", "text", "command", "power"}
+
+
+def run_deck_button(btn):
+    t, v = btn.get("type"), str(btn.get("value", "")).strip()
+    if not v:
+        raise ValueError("У кнопки не задано действие")
+    if t == "hotkey":
+        for step in v.split(","):          # "ctrl+c, alt+tab, ctrl+v"
+            if step.strip():
+                key(step.strip())
+                time.sleep(0.05)
+    elif t == "launch":
+        if IS_WIN:
+            os.startfile(v)
+        else:
+            import shlex
+            subprocess.Popen(shlex.split(v), stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL, start_new_session=True)
+    elif t == "url":
+        webbrowser.open(v if "://" in v else "https://" + v)
+    elif t == "text":
+        type_text(v.replace("\\n", "\n"))
+    elif t == "command":
+        subprocess.Popen(v, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    elif t == "power":
+        if not power(v):
+            raise ValueError("Неизвестное действие питания")
+    else:
+        raise ValueError("Неизвестный тип кнопки")
+
+
+def clean_deck(items):
+    if not isinstance(items, list) or len(items) > 120:
+        raise ValueError("Некорректный список кнопок")
+    out = []
+    for it in items:
+        if not isinstance(it, dict) or it.get("type") not in DECK_TYPES:
+            raise ValueError("Некорректная кнопка")
+        out.append({
+            "id": str(it.get("id") or secrets.token_hex(4))[:16],
+            "icon": str(it.get("icon", ""))[:8],
+            "label": str(it.get("label", ""))[:40],
+            "color": str(it.get("color", "#20242d"))[:9],
+            "type": it["type"],
+            "value": str(it.get("value", ""))[:1000],
+        })
+    return out
 
 
 def screenshot_png():
@@ -395,6 +488,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, ICON, "image/svg+xml")
         if not self._authorized():
             return self._send(403, {"error": "Неверный ключ"})
+        if path == "/api/deck":
+            return self._send(200, CFG["deck"])
         if path == "/api/status":
             return self._send(200, status())
         if path == "/api/screenshot":
@@ -430,6 +525,15 @@ class Handler(BaseHTTPRequestHandler):
                 key(str(data.get("key", "")))
             elif path == "/api/type":
                 type_text(str(data.get("text", ""))[:2000])
+            elif path == "/api/deck":
+                CFG["deck"] = clean_deck(data.get("deck"))
+                save_config(CFG)
+                return self._send(200, CFG["deck"])
+            elif path == "/api/deck/run":
+                btn = next((b for b in CFG["deck"] if b["id"] == data.get("id")), None)
+                if not btn:
+                    return self._send(404, {"error": "Кнопка не найдена"})
+                run_deck_button(btn)
             elif path == "/api/open":
                 url = str(data.get("url", "")).strip()
                 if not url:

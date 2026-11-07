@@ -67,6 +67,39 @@
     max-width: calc(100% - 32px); text-align: center; }
   #toast.show { opacity: 1; transform: translateX(-50%); }
   #login { display: none; }
+  /* ---- пульт ---- */
+  .deckbar { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+  .deckbar h2 { flex: 1; margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .deckbar button { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+  #deck { display: grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap: 10px; }
+  .dk { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 8px; border-radius: 18px; position: relative; overflow: hidden;
+    box-shadow: inset 0 -3px 0 #0003, 0 2px 6px #0004; }
+  .dk .ic { font-size: 34px; margin: 0; }
+  .dk .lb { font-size: 13px; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; text-shadow: 0 1px 2px #0008; }
+  .dk.flash { animation: flash .35s; }
+  .dk.fail { animation: fail .5s; }
+  @keyframes flash { 0% { filter: brightness(2); } 100% { filter: none; } }
+  @keyframes fail { 0%, 100% { transform: none; } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  #deck.editing .dk { outline: 2px dashed #fff6; outline-offset: -4px; }
+  #deck.editing .dk::after { content: "✎"; position: absolute; top: 6px; right: 9px; font-size: 13px; opacity: .8; }
+  .dk.add { background: transparent; border: 2px dashed #3a404d; box-shadow: none; color: var(--muted); }
+  dialog { background: var(--card); color: var(--text); border: 0; border-radius: 20px; padding: 18px;
+    width: min(440px, calc(100% - 24px)); max-height: calc(100% - 24px); }
+  dialog::backdrop { background: #000a; }
+  dialog h3 { margin: 0 0 12px; font-size: 18px; }
+  dialog label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+  dialog select { width: 100%; font: inherit; color: var(--text); background: var(--card2); border: 1px solid #2c313c;
+    border-radius: 12px; padding: 12px; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  .swatches button { width: 38px; height: 38px; min-height: 0; padding: 0; border-radius: 10px; }
+  .swatches button.sel { outline: 3px solid #fff; outline-offset: 2px; }
+  .emojis { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .emojis button { min-height: 0; padding: 6px; font-size: 22px; background: none; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .dlg-actions { display: grid; grid-template-columns: auto auto 1fr 1fr; gap: 8px; margin-top: 18px; }
+  .dlg-actions button { min-height: 46px; padding: 10px 12px; }
   code { background: var(--card2); padding: 2px 6px; border-radius: 6px; font-size: 13px; word-break: break-all; }
 </style>
 </head>
@@ -84,8 +117,55 @@
   <div class="row"><input id="tokenInput" placeholder="Ключ"><button class="accent" id="saveToken">OK</button></div>
 </section>
 
+<!-- ============ ПУЛЬТ ============ -->
+<section class="page sel" id="p-deck">
+  <div class="deckbar">
+    <h2>Пульт</h2>
+    <button id="colsBtn" aria-label="Размер сетки">▦ 3</button>
+    <button id="editBtn">✎ Настроить</button>
+  </div>
+  <div id="deck"></div>
+  <p class="muted" id="deckHint" style="display:none">Режим настройки: нажмите на кнопку, чтобы изменить её, или «+», чтобы добавить новую.</p>
+</section>
+
+<dialog id="dlg">
+  <form method="dialog" id="dlgForm">
+    <h3 id="dlgTitle">Кнопка</h3>
+    <div class="row">
+      <div style="flex:0 0 80px"><label for="fIcon">Иконка</label><input id="fIcon" maxlength="8" style="text-align:center;font-size:22px;padding:8px"></div>
+      <div><label for="fLabel">Название</label><input id="fLabel" maxlength="40" placeholder="Например: OBS запись"></div>
+    </div>
+    <div class="emojis" id="emojis"></div>
+    <label>Цвет</label>
+    <div class="swatches" id="swatches"></div>
+    <label for="fType">Действие</label>
+    <select id="fType">
+      <option value="hotkey">⌨ Сочетание клавиш</option>
+      <option value="launch">🚀 Запустить программу / файл</option>
+      <option value="url">🌐 Открыть сайт</option>
+      <option value="text">✍ Напечатать текст</option>
+      <option value="command">⚙ Команда (cmd / shell)</option>
+      <option value="power">⏻ Питание</option>
+    </select>
+    <label for="fValue" id="fValueLabel">Значение</label>
+    <input id="fValue">
+    <select id="fPower" style="display:none">
+      <option value="shutdown">Выключить</option><option value="reboot">Перезагрузить</option>
+      <option value="sleep">Сон</option><option value="lock">Заблокировать</option>
+      <option value="monitor_off">Погасить экран</option><option value="cancel">Отменить выключение</option>
+    </select>
+    <div class="hint" id="fHint"></div>
+    <div class="dlg-actions">
+      <button type="button" id="mvL" aria-label="Сдвинуть влево">←</button>
+      <button type="button" id="mvR" aria-label="Сдвинуть вправо">→</button>
+      <button type="button" class="danger" id="delBtn">Удалить</button>
+      <button type="submit" class="accent" value="save">Сохранить</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- ============ ПИТАНИЕ ============ -->
-<section class="page sel" id="p-power">
+<section class="page" id="p-power">
   <div class="card">
     <h2>Состояние</h2>
     <div class="stats">
@@ -205,7 +285,8 @@
 </section>
 
 <nav>
-  <button class="sel" data-tab="p-power"><span class="ic">⏻</span>Питание</button>
+  <button class="sel" data-tab="p-deck"><span class="ic">▦</span>Пульт</button>
+  <button data-tab="p-power"><span class="ic">⏻</span>Питание</button>
   <button data-tab="p-mouse"><span class="ic">🖱</span>Мышь</button>
   <button data-tab="p-keys"><span class="ic">⌨</span>Клавиатура</button>
   <button data-tab="p-media"><span class="ic">♫</span>Медиа</button>
@@ -246,7 +327,7 @@
   const act = (path, body, okMsg) => api(path, body).then(() => okMsg && toast(okMsg)).catch((e) => toast(e.message));
 
   function showLogin() { $("#login").style.display = "block"; }
-  $("#saveToken").onclick = () => { token = $("#tokenInput").value.trim(); store.set("pcr_token", token); $("#login").style.display = "none"; refresh(); };
+  $("#saveToken").onclick = () => { token = $("#tokenInput").value.trim(); store.set("pcr_token", token); $("#login").style.display = "none"; refresh(); loadDeck(); };
 
   // ---- вкладки
   document.querySelectorAll("nav button").forEach((b) => b.onclick = () => {
@@ -324,6 +405,118 @@
       img.src = URL.createObjectURL(await res.blob()); img.style.display = "block";
     } catch (e) { toast(e.message); }
   };
+
+  // ---- пульт (stream deck)
+  const COLORS = ["#20242d", "#4f8cff", "#7b61ff", "#e04fd0", "#ff5a5f", "#ff0033", "#f5a623", "#f2d544", "#3ecf8e", "#14b8a6", "#64748b", "#111111"];
+  const EMOJIS = ["🎮", "🎵", "🎙", "🔴", "⏺", "📷", "💬", "🌐", "📁", "📝", "⚙️", "🖥", "🔊", "🔇", "⏯", "🚀", "⭐", "💡", "🎬", "🟢"];
+  const TYPE_INFO = {
+    hotkey: ["Сочетание клавиш", "ctrl+shift+s", "Через «+»: ctrl, alt, shift, win, a–z, 0–9, f1–f24, enter, esc, tab, space, стрелки, home, end, play, next, vol_up… Несколько шагов — через запятую: ctrl+c, alt+tab, ctrl+v"],
+    launch: ["Путь к программе или файлу", "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe", "Полный путь к .exe, ярлыку или файлу. Короткие имена тоже работают: notepad, calc, mspaint"],
+    url: ["Адрес сайта", "twitch.tv", "Откроется в браузере по умолчанию"],
+    text: ["Текст", "Всем привет!", "Будет напечатан в активном окне. \\n — перенос строки (Enter)"],
+    command: ["Команда", "start steam://rungameid/730", "Выполняется в командной строке компьютера. Будьте осторожны"],
+    power: ["Действие", "", ""],
+  };
+  const deckEl = $("#deck"), dlg = $("#dlg");
+  let deck = [], editing = false, editIdx = -1, cols = +(store.get("pcr_cols") || 3);
+  const applyCols = () => { deckEl.style.setProperty("--cols", cols); $("#colsBtn").textContent = "▦ " + cols; };
+  applyCols();
+  $("#colsBtn").onclick = () => { cols = cols >= 5 ? 2 : cols + 1; store.set("pcr_cols", cols); applyCols(); };
+
+  const textColor = (hex) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || ""); if (!m) return "#fff";
+    const n = parseInt(m[1], 16), l = (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255;
+    return l > 0.65 ? "#111" : "#fff";
+  };
+  function renderDeck() {
+    deckEl.innerHTML = "";
+    deckEl.classList.toggle("editing", editing);
+    deck.forEach((b, i) => {
+      const el = document.createElement("button");
+      el.className = "dk"; el.style.background = b.color || "#20242d"; el.style.color = textColor(b.color);
+      const ic = document.createElement("span"); ic.className = "ic"; ic.textContent = b.icon || "■";
+      const lb = document.createElement("span"); lb.className = "lb"; lb.textContent = b.label || "";
+      el.append(ic, lb);
+      el.onclick = () => editing ? openEditor(i) : runBtn(b, el);
+      deckEl.append(el);
+    });
+    if (editing || !deck.length) {
+      const add = document.createElement("button");
+      add.className = "dk add"; add.innerHTML = '<span class="ic">+</span><span class="lb">Добавить</span>';
+      add.onclick = () => openEditor(-1);
+      deckEl.append(add);
+    }
+  }
+  async function runBtn(b, el) {
+    vibrate();
+    try { await api("/api/deck/run", { id: b.id }); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+    catch (e) { el.classList.remove("fail"); void el.offsetWidth; el.classList.add("fail"); toast(e.message); }
+  }
+  async function loadDeck() { try { deck = await api("/api/deck"); renderDeck(); } catch (e) { /* статус покажет ошибку */ } }
+  async function saveDeck() {
+    try { deck = await api("/api/deck", { deck }); renderDeck(); toast("Сохранено"); }
+    catch (e) { toast(e.message); }
+  }
+  $("#editBtn").onclick = () => {
+    editing = !editing;
+    $("#editBtn").textContent = editing ? "✓ Готово" : "✎ Настроить";
+    $("#editBtn").classList.toggle("accent", editing);
+    $("#deckHint").style.display = editing ? "block" : "none";
+    renderDeck();
+  };
+
+  let fColor = COLORS[1];
+  const sw = $("#swatches");
+  COLORS.forEach((c) => {
+    const b = document.createElement("button"); b.type = "button"; b.style.background = c; b.dataset.c = c;
+    b.setAttribute("aria-label", c);
+    b.onclick = () => { fColor = c; sw.querySelectorAll("button").forEach((x) => x.classList.toggle("sel", x === b)); };
+    sw.append(b);
+  });
+  EMOJIS.forEach((em) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = em;
+    b.onclick = () => { $("#fIcon").value = em; };
+    $("#emojis").append(b);
+  });
+  function syncType() {
+    const t = $("#fType").value, [label, ph, hint] = TYPE_INFO[t];
+    $("#fValueLabel").textContent = label; $("#fValue").placeholder = ph; $("#fHint").textContent = hint;
+    $("#fValue").style.display = t === "power" ? "none" : "block";
+    $("#fPower").style.display = t === "power" ? "block" : "none";
+  }
+  $("#fType").onchange = syncType;
+  function openEditor(i) {
+    editIdx = i;
+    const b = i >= 0 ? deck[i] : { icon: "⭐", label: "", color: COLORS[1], type: "hotkey", value: "" };
+    $("#dlgTitle").textContent = i >= 0 ? "Изменить кнопку" : "Новая кнопка";
+    $("#fIcon").value = b.icon; $("#fLabel").value = b.label; $("#fType").value = b.type;
+    $("#fValue").value = b.type === "power" ? "" : b.value;
+    $("#fPower").value = b.type === "power" ? b.value : "shutdown";
+    fColor = b.color; sw.querySelectorAll("button").forEach((x) => x.classList.toggle("sel", x.dataset.c === fColor));
+    $("#delBtn").style.visibility = $("#mvL").style.visibility = $("#mvR").style.visibility = i >= 0 ? "visible" : "hidden";
+    syncType(); dlg.showModal();
+  }
+  $("#dlgForm").onsubmit = (e) => {
+    e.preventDefault();
+    const type = $("#fType").value;
+    const value = type === "power" ? $("#fPower").value : $("#fValue").value.trim();
+    if (!value) return toast("Заполните действие");
+    const b = { id: editIdx >= 0 ? deck[editIdx].id : "", icon: $("#fIcon").value.trim(),
+      label: $("#fLabel").value.trim(), color: fColor, type, value };
+    if (editIdx >= 0) deck[editIdx] = b; else deck.push(b);
+    dlg.close(); saveDeck();
+  };
+  $("#delBtn").onclick = () => {
+    if (!confirm("Удалить кнопку?")) return;
+    deck.splice(editIdx, 1); dlg.close(); saveDeck();
+  };
+  const move = (d) => {
+    const j = editIdx + d; if (j < 0 || j >= deck.length) return;
+    [deck[editIdx], deck[j]] = [deck[j], deck[editIdx]]; dlg.close(); saveDeck();
+  };
+  $("#mvL").onclick = () => move(-1); $("#mvR").onclick = () => move(1);
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+  loadDeck();
 
   // ---- тачпад
   const pad = $("#pad"), sensEl = $("#sens");
