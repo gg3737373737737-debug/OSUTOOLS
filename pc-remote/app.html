@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PC Remote">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>PC Remote</title>
+<style>
+  :root {
+    --bg: #0f1115; --card: #181b22; --card2: #20242d; --text: #e8eaf0; --muted: #8a90a0;
+    --accent: #4f8cff; --danger: #ff5a5f; --ok: #3ecf8e; --warn: #f5a623; --r: 16px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { padding: env(safe-area-inset-top) 16px calc(76px + env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; gap: 10px; padding: 16px 0 8px; }
+  header h1 { font-size: 20px; margin: 0; flex: 1; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+  .dot.on { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .dot.off { background: var(--danger); }
+  .card { background: var(--card); border-radius: var(--r); padding: 14px; margin: 12px 0; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .grid.g3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.g4 { grid-template-columns: repeat(4, 1fr); }
+  button { font: inherit; color: var(--text); background: var(--card2); border: 0; border-radius: 12px;
+    padding: 14px 8px; min-height: 52px; cursor: pointer; user-select: none; touch-action: manipulation; }
+  button:active { transform: scale(.97); filter: brightness(1.25); }
+  button.big { font-size: 18px; min-height: 72px; }
+  button.danger { background: color-mix(in srgb, var(--danger) 22%, var(--card2)); }
+  button.accent { background: var(--accent); color: #fff; }
+  button .ic { display: block; font-size: 24px; line-height: 1; margin-bottom: 4px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
+  .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  .bar { height: 6px; background: var(--card2); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s; }
+  .muted { color: var(--muted); font-size: 13px; }
+  input, textarea { width: 100%; font: inherit; color: var(--text); background: var(--card2); border: 1px solid #2c313c;
+    border-radius: 12px; padding: 12px; outline: none; }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .row > * { flex: 1; }
+  .row > button { flex: 0 0 auto; padding: 12px 18px; }
+  #pad { height: 52vh; min-height: 260px; background: var(--card); border-radius: var(--r); touch-action: none;
+    display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 14px;
+    text-align: center; padding: 20px; user-select: none; -webkit-user-select: none; position: relative; }
+  #pad.active { outline: 2px solid var(--accent); }
+  .slider { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .slider input { flex: 1; padding: 0; accent-color: var(--accent); }
+  #shot { width: 100%; border-radius: 12px; display: none; margin-top: 10px; }
+  nav { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #12151bf2;
+    backdrop-filter: blur(10px); border-top: 1px solid #222631; padding-bottom: env(safe-area-inset-bottom); z-index: 5; }
+  nav button { flex: 1; background: none; border-radius: 0; font-size: 11px; color: var(--muted); min-height: 62px; padding: 8px 2px; }
+  nav button .ic { font-size: 22px; }
+  nav button.sel { color: var(--accent); }
+  .page { display: none; } .page.sel { display: block; }
+  #toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%) translateY(20px); opacity: 0;
+    background: #2a2f3a; padding: 10px 16px; border-radius: 12px; transition: .25s; pointer-events: none; z-index: 10;
+    max-width: calc(100% - 32px); text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%); }
+  #login { display: none; }
+  code { background: var(--card2); padding: 2px 6px; border-radius: 6px; font-size: 13px; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="dot" id="dot"></span>
+  <h1 id="host">PC Remote</h1>
+  <button id="refresh" style="min-height:40px;padding:8px 12px" aria-label="Обновить">⟳</button>
+</header>
+
+<section id="login" class="card">
+  <h2>Подключение</h2>
+  <p class="muted">Откройте ссылку из консоли сервера на компьютере или вставьте ключ из файла <code>config.json</code>.</p>
+  <div class="row"><input id="tokenInput" placeholder="Ключ"><button class="accent" id="saveToken">OK</button></div>
+</section>
+
+<!-- ============ ПИТАНИЕ ============ -->
+<section class="page sel" id="p-power">
+  <div class="card">
+    <h2>Состояние</h2>
+    <div class="stats">
+      <div class="stat"><b id="cpu">–</b><span>CPU</span><div class="bar"><i id="cpuBar"></i></div></div>
+      <div class="stat"><b id="ram">–</b><span>RAM</span><div class="bar"><i id="ramBar"></i></div></div>
+      <div class="stat"><b id="up">–</b><span>Работает</span></div>
+    </div>
+    <p class="muted" id="osline" style="margin:10px 0 0"></p>
+  </div>
+
+  <div class="card">
+    <h2>Питание</h2>
+    <div class="grid">
+      <button class="big danger" data-power="shutdown" data-confirm="Выключить компьютер?"><span class="ic">⏻</span>Выключить</button>
+      <button class="big" data-power="reboot" data-confirm="Перезагрузить компьютер?"><span class="ic">↻</span>Перезагрузить</button>
+      <button data-power="sleep" data-confirm="Отправить в сон?"><span class="ic">☾</span>Сон</button>
+      <button data-power="lock"><span class="ic">🔒</span>Заблокировать</button>
+      <button data-power="monitor_off"><span class="ic">🖵</span>Погасить экран</button>
+      <button data-power="logoff" data-confirm="Выйти из учётной записи?"><span class="ic">⇥</span>Выйти</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Таймер выключения</h2>
+    <div class="grid g4">
+      <button data-timer="15">15 мин</button><button data-timer="30">30 мин</button>
+      <button data-timer="60">1 час</button><button data-timer="120">2 часа</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input id="customMin" type="number" inputmode="numeric" min="1" placeholder="Минут">
+      <button id="customTimer">Старт</button>
+    </div>
+    <button style="width:100%;margin-top:10px" data-power="cancel">✕ Отменить выключение</button>
+  </div>
+
+  <div class="card">
+    <h2>Включение (Wake-on-LAN)</h2>
+    <p class="muted" style="margin:0">Выключенный компьютер эта страница разбудить не может: браузер не умеет отправлять «магический пакет». Используйте приложение <b>Wake On Lan</b> (Android/iOS) или функцию WoL в роутере, указав MAC:</p>
+    <p style="margin:10px 0 0"><code id="mac">–</code> <button id="copyMac" style="min-height:36px;padding:6px 12px;margin-left:6px">Копировать</button></p>
+  </div>
+</section>
+
+<!-- ============ МЫШЬ ============ -->
+<section class="page" id="p-mouse">
+  <div class="card" style="padding:0;background:none">
+    <div id="pad">Водите пальцем — курсор<br>Тап — клик · Два пальца — прокрутка<br>Тап двумя пальцами — правый клик</div>
+  </div>
+  <div class="grid g3">
+    <button data-click="left">Левая</button>
+    <button data-click="middle">Средняя</button>
+    <button data-click="right">Правая</button>
+  </div>
+  <div class="slider">Скорость <input type="range" id="sens" min="0.5" max="5" step="0.1" value="2"><span id="sensVal">2.0</span></div>
+</section>
+
+<!-- ============ КЛАВИАТУРА ============ -->
+<section class="page" id="p-keys">
+  <div class="card">
+    <h2>Ввод текста</h2>
+    <textarea id="text" rows="3" placeholder="Текст будет напечатан на компьютере"></textarea>
+    <div class="grid" style="margin-top:10px">
+      <button class="accent" id="sendText">Отправить</button>
+      <button id="sendTextEnter">Отправить + Enter</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Клавиши</h2>
+    <div class="grid g4">
+      <button data-key="esc">Esc</button><button data-key="tab">Tab</button>
+      <button data-key="backspace">⌫</button><button data-key="enter">Enter</button>
+      <button data-key="space">Пробел</button><button data-key="up">↑</button>
+      <button data-key="delete">Del</button><button data-key="f5">F5</button>
+      <button data-key="left">←</button><button data-key="down">↓</button>
+      <button data-key="right">→</button><button data-key="f11">F11</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Сочетания</h2>
+    <div class="grid g3">
+      <button data-key="alt+tab">Alt+Tab</button>
+      <button data-key="alt+f4" data-confirm="Закрыть активное окно?">Alt+F4</button>
+      <button data-key="win">Win</button>
+      <button data-key="win+d">Рабочий стол</button>
+      <button data-key="ctrl+shift+esc">Диспетчер</button>
+      <button data-key="win+tab">Окна</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ МЕДИА ============ -->
+<section class="page" id="p-media">
+  <div class="card">
+    <h2>Громкость</h2>
+    <div class="grid g3">
+      <button class="big" data-key="vol_down" data-repeat><span class="ic">🔉</span>Тише</button>
+      <button class="big" data-key="vol_mute"><span class="ic">🔇</span>Без звука</button>
+      <button class="big" data-key="vol_up" data-repeat><span class="ic">🔊</span>Громче</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Плеер</h2>
+    <div class="grid g3">
+      <button class="big" data-key="prev"><span class="ic">⏮</span>Назад</button>
+      <button class="big accent" data-key="play"><span class="ic">⏯</span>Пауза</button>
+      <button class="big" data-key="next"><span class="ic">⏭</span>Вперёд</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Открыть сайт</h2>
+    <div class="row"><input id="url" type="url" inputmode="url" placeholder="youtube.com"><button id="openUrl">Открыть</button></div>
+  </div>
+  <div class="card">
+    <h2>Экран</h2>
+    <button style="width:100%" id="shotBtn">📷 Снимок экрана</button>
+    <img id="shot" alt="Снимок экрана компьютера">
+  </div>
+</section>
+
+<nav>
+  <button class="sel" data-tab="p-power"><span class="ic">⏻</span>Питание</button>
+  <button data-tab="p-mouse"><span class="ic">🖱</span>Мышь</button>
+  <button data-tab="p-keys"><span class="ic">⌨</span>Клавиатура</button>
+  <button data-tab="p-media"><span class="ic">♫</span>Медиа</button>
+</nav>
+<div id="toast"></div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+
+  // ---- токен: берём из ?t=, запоминаем, убираем из адресной строки
+  const qs = new URLSearchParams(location.search);
+  if (qs.get("t")) { store.set("pcr_token", qs.get("t")); history.replaceState(null, "", location.pathname); }
+  let token = store.get("pcr_token") || qs.get("t") || "";
+
+  const toast = (msg) => {
+    const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800);
+  };
+  const vibrate = () => { try { navigator.vibrate && navigator.vibrate(15); } catch {} };
+
+  async function api(path, body, opts = {}) {
+    const res = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      headers: { "X-Token": token, "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    if (res.status === 403) { showLogin(); throw new Error("Неверный ключ"); }
+    if (opts.raw) return res;
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ("Ошибка " + res.status));
+    return data;
+  }
+  const act = (path, body, okMsg) => api(path, body).then(() => okMsg && toast(okMsg)).catch((e) => toast(e.message));
+
+  function showLogin() { $("#login").style.display = "block"; }
+  $("#saveToken").onclick = () => { token = $("#tokenInput").value.trim(); store.set("pcr_token", token); $("#login").style.display = "none"; refresh(); };
+
+  // ---- вкладки
+  document.querySelectorAll("nav button").forEach((b) => b.onclick = () => {
+    document.querySelectorAll("nav button, .page").forEach((x) => x.classList.remove("sel"));
+    b.classList.add("sel"); $("#" + b.dataset.tab).classList.add("sel");
+    store.set("pcr_tab", b.dataset.tab);
+  });
+  const lastTab = store.get("pcr_tab");
+  if (lastTab && $(`nav [data-tab="${lastTab}"]`)) $(`nav [data-tab="${lastTab}"]`).click();
+
+  // ---- статус
+  const fmtUp = (s) => { const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+    return d ? `${d}д ${h}ч` : h ? `${h}ч ${m}м` : `${m}м`; };
+  async function refresh() {
+    if (!token) return showLogin();
+    try {
+      const s = await api("/api/status");
+      $("#dot").className = "dot on";
+      $("#host").textContent = s.host;
+      $("#cpu").textContent = Math.round(s.cpu) + "%"; $("#cpuBar").style.width = s.cpu + "%";
+      $("#ram").textContent = s.ram + "%"; $("#ramBar").style.width = s.ram + "%";
+      $("#up").textContent = fmtUp(s.uptime);
+      $("#osline").textContent = `${s.os} · ${s.ram_total_gb} ГБ RAM · ${s.ip}`;
+      $("#mac").textContent = s.mac; store.set("pcr_mac", s.mac);
+    } catch (e) {
+      $("#dot").className = "dot off";
+      $("#host").textContent = "Нет связи";
+      const mac = store.get("pcr_mac"); if (mac) $("#mac").textContent = mac;
+    }
+  }
+  $("#refresh").onclick = refresh;
+  refresh(); setInterval(() => { if (!document.hidden && $("#p-power").classList.contains("sel")) refresh(); }, 5000);
+  $("#copyMac").onclick = () => navigator.clipboard?.writeText($("#mac").textContent).then(() => toast("Скопировано"));
+
+  // ---- питание
+  const POWER_MSG = { shutdown: "Выключение…", reboot: "Перезагрузка…", sleep: "Сон…", lock: "Заблокировано",
+    monitor_off: "Экран погашен", logoff: "Выход…", cancel: "Выключение отменено" };
+  document.querySelectorAll("[data-power]").forEach((b) => b.onclick = () => {
+    if (b.dataset.confirm && !confirm(b.dataset.confirm)) return;
+    vibrate(); act("/api/power", { action: b.dataset.power }, POWER_MSG[b.dataset.power]);
+  });
+  const timer = (min) => {
+    if (!(min > 0)) return toast("Укажите минуты");
+    act("/api/power", { action: "shutdown", minutes: min }, `Выключение через ${min} мин`);
+  };
+  document.querySelectorAll("[data-timer]").forEach((b) => b.onclick = () => timer(+b.dataset.timer));
+  $("#customTimer").onclick = () => timer(+$("#customMin").value);
+
+  // ---- клавиши
+  document.querySelectorAll("[data-key]").forEach((b) => {
+    const send = () => { vibrate(); api("/api/key", { key: b.dataset.key }).catch((e) => toast(e.message)); };
+    if (b.hasAttribute("data-repeat")) {
+      let iv;
+      const stop = () => clearInterval(iv);
+      b.addEventListener("pointerdown", () => { send(); iv = setInterval(send, 150); });
+      ["pointerup", "pointerleave", "pointercancel"].forEach((ev) => b.addEventListener(ev, stop));
+    } else {
+      b.onclick = () => { if (b.dataset.confirm && !confirm(b.dataset.confirm)) return; send(); };
+    }
+  });
+  const sendText = (enter) => {
+    const t = $("#text").value; if (!t) return;
+    act("/api/type", { text: t + (enter ? "\n" : "") }, "Отправлено").then(() => { $("#text").value = ""; });
+  };
+  $("#sendText").onclick = () => sendText(false);
+  $("#sendTextEnter").onclick = () => sendText(true);
+  $("#openUrl").onclick = () => { const u = $("#url").value.trim(); if (u) act("/api/open", { url: u }, "Открываю…"); };
+
+  // ---- скриншот
+  $("#shotBtn").onclick = async () => {
+    try {
+      const res = await api("/api/screenshot?_=" + Date.now(), undefined, { raw: true });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); return toast(d.error || "Ошибка"); }
+      const img = $("#shot"); if (img.src) URL.revokeObjectURL(img.src);
+      img.src = URL.createObjectURL(await res.blob()); img.style.display = "block";
+    } catch (e) { toast(e.message); }
+  };
+
+  // ---- тачпад
+  const pad = $("#pad"), sensEl = $("#sens");
+  sensEl.value = store.get("pcr_sens") || "2"; $("#sensVal").textContent = (+sensEl.value).toFixed(1);
+  sensEl.oninput = () => { $("#sensVal").textContent = (+sensEl.value).toFixed(1); store.set("pcr_sens", sensEl.value); };
+
+  let acc = { dx: 0, dy: 0, scroll: 0 }, busy = false;
+  async function flush() {
+    if (busy) return; busy = true;
+    try {
+      while (Math.abs(acc.dx) >= 1 || Math.abs(acc.dy) >= 1 || Math.abs(acc.scroll) >= 1) {
+        if (Math.abs(acc.scroll) >= 1) {
+          const amount = Math.trunc(acc.scroll); acc.scroll -= amount;
+          await api("/api/mouse/scroll", { amount });
+        } else {
+          const dx = Math.trunc(acc.dx), dy = Math.trunc(acc.dy); acc.dx -= dx; acc.dy -= dy;
+          await api("/api/mouse/move", { dx, dy });
+        }
+      }
+    } catch (e) { toast(e.message); acc = { dx: 0, dy: 0, scroll: 0 }; }
+    busy = false;
+  }
+
+  let touches = {}, startT = 0, moved = 0, maxFingers = 0;
+  const center = (list) => { let x = 0, y = 0; for (const t of list) { x += t.clientX; y += t.clientY; } return { x: x / list.length, y: y / list.length }; };
+  let last = null;
+  pad.addEventListener("touchstart", (e) => {
+    e.preventDefault(); pad.classList.add("active");
+    if (e.touches.length === 1) { startT = Date.now(); moved = 0; maxFingers = 1; }
+    maxFingers = Math.max(maxFingers, e.touches.length);
+    last = center(e.touches);
+  }, { passive: false });
+  pad.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const c = center(e.touches), dx = c.x - last.x, dy = c.y - last.y; last = c;
+    moved += Math.abs(dx) + Math.abs(dy);
+    const s = +sensEl.value;
+    if (e.touches.length >= 2) acc.scroll += -dy * 0.6;
+    else { const k = s * (1 + Math.min(Math.hypot(dx, dy) / 25, 1.5)); acc.dx += dx * k; acc.dy += dy * k; }
+    flush();
+  }, { passive: false });
+  pad.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    if (e.touches.length) { last = center(e.touches); return; }
+    pad.classList.remove("active");
+    if (Date.now() - startT < 250 && moved < 10) {
+      vibrate(); api("/api/mouse/click", { button: maxFingers >= 2 ? "right" : "left" }).catch((er) => toast(er.message));
+    }
+  }, { passive: false });
+
+  document.querySelectorAll("[data-click]").forEach((b) => b.onclick = () => {
+    vibrate(); api("/api/mouse/click", { button: b.dataset.click }).catch((e) => toast(e.message));
+  });
+})();
+</script>
+</body>
+</html>
